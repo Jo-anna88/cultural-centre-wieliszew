@@ -1,5 +1,7 @@
 package pl.joannaz.culturalcentrewieliszew.user;
 
-public class UserRepository
-{
+import java.util.List;
+
+public class UserRepository {
+
 }

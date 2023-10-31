@@ -14,4 +14,9 @@ public class UserController {
     public List<User> getUsers() {
         return List.of(new User(UUID.randomUUID(), "name", "aaa@o2.pl"));
     }
+    /*
+    public List<UserDTO> getAllUsers() {
+        return userRepository.findAll().parallelStream().map(user -> new UserDTO(user)).collect(Collectors.toList());
+    }
+     */
 }

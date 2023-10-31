@@ -9,7 +9,7 @@ import static pl.joannaz.culturalcentrewieliszew.utils.constants.SIMPLE_TEXT;
 
 @Service
 public class CourseService {
-    public List<Course> getCourses() {
+    public List<Course> getAllCourses() {
         return List.of(
                 new Course("assets/icons/ballet-shoes.png", "Ballet", "Anna Baletowicz", SIMPLE_TEXT),
                 new Course("assets/icons/chess.png", "Chess", "Igor Szachista", SIMPLE_TEXT),
