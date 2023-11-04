@@ -1,5 +1,6 @@
 package pl.joannaz.culturalcentrewieliszew.course;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,37 +21,39 @@ public class CourseController {
     private final CourseRepository courseRepository;
     private final CourseService courseService;
 
+    //@Autowired
     public CourseController(CourseService courseService, CourseRepository courseRepository) {
         this.courseService = courseService;
         this.courseRepository = courseRepository;
     }
 
     @GetMapping
-    public List<Course> getAllCourses() throws InterruptedException {
-        Thread.sleep(3000); // to check dealing with slow REST responses
-        return courseService.getAllCourses();
+    public List<Course> getAllCourses(HttpServletResponse response) throws InterruptedException {
+         //Thread.sleep(3000); // to check dealing with slow REST responses
+         return courseService.getAllCourses();
+        //response.setStatus(500);
+        //return null;
     }
 
     @GetMapping("/{id}")
-    public Course getCourseById(@PathVariable("id") UUID id) {
-        return courseRepository.findById(id).get();
+    public Course getCourseById(@PathVariable("id") UUID id)
+    {
+        return courseService.getCourseById(id);
+        //return courseRepository.findById(id).get();
     }
 
     @PostMapping()
     public Course addCourse(@RequestBody Course course) {
-        return courseRepository.save(course);
+        return courseService.addCourse(course);
     }
 
-    /*
     @PutMapping()
     public Course updateCourse(@RequestBody Course updatedCourse) {
-        Course originalCourse = courseRepository.findById(updatedCourse.getId()).get();
-        //return courseRepository.
+        return courseService.updateCourse(updatedCourse);
     }
-     */
 
     @DeleteMapping()
-    public int deleteCourse() {
-        return 0;
+    public int deleteCourse(@RequestBody UUID id) {
+        return courseService.deleteCourse(id);
     }
 }

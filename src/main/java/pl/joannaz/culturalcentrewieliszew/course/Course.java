@@ -65,4 +65,12 @@ public class Course {
         this.teacher = teacher;
         this.description = description;
     }
+
+    public Course(Course originalCourse) {
+        this.id = originalCourse.id;
+        this.imgSource = originalCourse.imgSource;
+        this.name = originalCourse.name;
+        this.teacher = originalCourse.teacher;
+        this.description = originalCourse.description;
+    }
 }
