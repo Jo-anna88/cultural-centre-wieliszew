@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -52,8 +53,9 @@ public class CourseController {
         return courseService.updateCourse(updatedCourse);
     }
 
-    @DeleteMapping()
-    public int deleteCourse(@RequestBody UUID id) {
+    @DeleteMapping("/{id}")
+    public int deleteCourse(@PathVariable("id") UUID id) {
+        System.out.println("deleteCourse: " + id);
         return courseService.deleteCourse(id);
     }
 }

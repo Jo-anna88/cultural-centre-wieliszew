@@ -1,10 +1,13 @@
 package pl.joannaz.culturalcentrewieliszew.course;
 
 
+import jakarta.persistence.Transient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 import static pl.joannaz.culturalcentrewieliszew.utils.constants.SIMPLE_TEXT;
@@ -20,36 +23,53 @@ public class CourseService {
     }
 
     public List<Course> getAllCourses() {
-        return List.of(
-                new Course("assets/icons/ballet-shoes.png", "Ballet", "Anna Baletowicz", SIMPLE_TEXT),
-                new Course("assets/icons/chess.png", "Chess", "Igor Szachista", SIMPLE_TEXT),
-                new Course("assets/icons/guitar.png", "Guitar", "Jan Muzyk", SIMPLE_TEXT),
-                new Course("assets/icons/pottery.png", "Pottery", "Katarzyna Waza", SIMPLE_TEXT),
-                new Course("assets/icons/theatre.png", "Theatre", "Agnieszka Teatralna", SIMPLE_TEXT),
-                new Course("assets/icons/microphone.png", "Vocal", "Łukasz Wokalista", SIMPLE_TEXT)
-        );
-        //return courseRepository.findAll();
+        return courseRepository.findAll();
     }
 
     public Course getCourseById(UUID id) {
-        return new Course("assets/icons/ballet-shoes.png", "Ballet", "Anna Baletowicz", SIMPLE_TEXT);
-        //return courseRepository.findById(id);
+        //return new Course("assets/icons/ballet-shoes.png", "Ballet", "Anna Baletowicz", SIMPLE_TEXT);
+        return courseRepository.findById(id).get();
     }
 
     public Course addCourse(Course course) {
         return courseRepository.save(course);
     }
 
+    public void addAllCourses(List<Course> courses) {
+        courseRepository.saveAll(courses);
+    }
+
+    // @Transient - when we have setters in our class
+    // thanks to that, we don't have to implement any JPQL query
     public Course updateCourse(Course updatedCourse) {
-        Course originalCourse = courseRepository.findById(updatedCourse.getId()).get();
-        originalCourse.setDescription(updatedCourse.getDescription());
-        originalCourse.setName(updatedCourse.getName());
+        Course originalCourse = courseRepository.findById(updatedCourse.getId())
+                .orElseThrow(() -> new IllegalStateException(
+                        "Course with this id does not exist."
+        ));
+        if(!Objects.equals(originalCourse.getDescription(), updatedCourse.getDescription())) {
+            originalCourse.setDescription(updatedCourse.getDescription());
+        }
+        if(!Objects.equals(originalCourse.getName(), updatedCourse.getName())) {
+            Optional<Course> courseOptional = courseRepository.findCourseByName(updatedCourse.getName());
+            if (courseOptional.isPresent()) {
+                throw new IllegalStateException("Such a name already exists.");
+            }
+            originalCourse.setName(updatedCourse.getName());
+        }
+        // if...
         originalCourse.setImgSource(updatedCourse.getImgSource());
+        // if...
         originalCourse.setTeacher(updatedCourse.getTeacher());
-        return new Course(courseRepository.save(originalCourse));
+        return courseRepository.save(originalCourse);
+        //return originalCourse; //because we use @Transactional we can use setters against methods from repository
+        //return new Course(courseRepository.save(originalCourse));
     }
 
     public int deleteCourse(UUID id) {
+        boolean exists = courseRepository.existsById(id);
+        if (!exists) {
+            throw new IllegalStateException("Such a course does not exist.");
+        }
         courseRepository.deleteById(id);
         return 1;
     }
