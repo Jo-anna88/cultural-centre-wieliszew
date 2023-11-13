@@ -65,12 +65,12 @@ public class CourseService {
         //return new Course(courseRepository.save(originalCourse));
     }
 
-    public int deleteCourse(UUID id) {
+    public UUID deleteCourse(UUID id) {
         boolean exists = courseRepository.existsById(id);
         if (!exists) {
             throw new IllegalStateException("Such a course does not exist.");
         }
         courseRepository.deleteById(id);
-        return 1;
+        return id;
     }
 }
