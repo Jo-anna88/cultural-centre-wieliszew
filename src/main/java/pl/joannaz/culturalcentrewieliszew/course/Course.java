@@ -38,7 +38,6 @@ public class Course {
     private UUID id;
     @Column(
             name="img_source",
-            nullable = false,
             columnDefinition = "TEXT"
     )
     private String imgSource;

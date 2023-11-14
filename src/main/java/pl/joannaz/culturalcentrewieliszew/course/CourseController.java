@@ -19,13 +19,11 @@ import java.util.UUID;
 @RequestMapping(path="/classes")
 public class CourseController {
 
-    private final CourseRepository courseRepository;
     private final CourseService courseService;
 
     //@Autowired
-    public CourseController(CourseService courseService, CourseRepository courseRepository) {
+    public CourseController(CourseService courseService) {
         this.courseService = courseService;
-        this.courseRepository = courseRepository;
     }
 
     @GetMapping
@@ -37,15 +35,14 @@ public class CourseController {
     }
 
     @GetMapping("/{id}")
-    public Course getCourseById(@PathVariable("id") UUID id)
-    {
+    public Course getCourseById(@PathVariable("id") UUID id) {
         return courseService.getCourseById(id);
         //return courseRepository.findById(id).get();
     }
 
     @PostMapping()
     public Course addCourse(@RequestBody Course course) {
-        return courseService.addCourse(course);
+        return courseService.addCourse(course); // id will be automatically added
     }
 
     @PutMapping()
