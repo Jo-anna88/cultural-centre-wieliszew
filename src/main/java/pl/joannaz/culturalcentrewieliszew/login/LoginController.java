@@ -7,6 +7,10 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.joannaz.culturalcentrewieliszew.user.User;
 
 import java.security.interfaces.RSAPrivateKey;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(path = "/api/auth")
@@ -14,13 +18,14 @@ public class LoginController {
     private int PRIVATE_KEY = 123;
 
     @PostMapping(path="/login")
-    public Object login (@RequestBody Object usernameAndPswd) {
-        System.out.println(usernameAndPswd);
-        return usernameAndPswd;
+    public Map<String,String> login (@RequestBody Map<String,String> credentials) {
+        System.out.println(credentials);
+        return credentials;
     }
 
-    @PostMapping(path="/signup")
-    public Object signup (@RequestBody Object newUser) {
+    @PostMapping(path="/signup") // id=null
+    public User signup (@RequestBody User newUser) {
+        newUser.setId(UUID.randomUUID());
         System.out.println(newUser);
         return newUser;
     }

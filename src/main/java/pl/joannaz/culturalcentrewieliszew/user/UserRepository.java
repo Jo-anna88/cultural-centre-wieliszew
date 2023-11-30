@@ -1,7 +1,10 @@
 package pl.joannaz.culturalcentrewieliszew.user;
 
-import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public class UserRepository {
+import java.util.Optional;
+import java.util.UUID;
 
+public interface UserRepository extends JpaRepository<User, UUID> {
+    Optional<User> findByUsername (String login);
 }
