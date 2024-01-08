@@ -26,6 +26,7 @@ import java.util.UUID;
 @Table(name="_user")
 @Entity(name="User")
 public class User {//implements UserDetails { // model (class called 'User' exists in PostgreSQL, so we should use other name
+    // it is important that SpringSecurity has its own class/interface called User too!
     @Id
     @GeneratedValue(strategy= GenerationType.UUID)
     private UUID id;
@@ -35,7 +36,7 @@ public class User {//implements UserDetails { // model (class called 'User' exis
     private String username; // e.g. email, login
     private String password;
     @Enumerated(EnumType.STRING) // it tells Spring Boot that it is enum
-    private Role role;
+    private Role role; // or: @ManyToMany(fetch = FetchType.EAGER) Collection<Role> roles = new ArrayList<>(); // 'eager' because we want to load all the roles whenever we load the user
     //private String token;
 /*
     @Override
