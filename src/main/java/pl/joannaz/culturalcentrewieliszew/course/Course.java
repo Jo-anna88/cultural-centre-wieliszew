@@ -21,7 +21,8 @@ import java.util.UUID;
 @Data
 public class Course {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    //@GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     /*
     @SequenceGenerator(
             name = "course_seq",
@@ -35,7 +36,7 @@ public class Course {
          nullable = false,
          updatable = false
     )
-    private UUID id;
+    private Long id;
     @Column(
             name="img_source",
             columnDefinition = "TEXT"
@@ -58,7 +59,7 @@ public class Course {
 
     public Course() {}
     public Course(String imgSource, String name, String teacher, String description) {
-        this.id = UUID.randomUUID();
+        //this.id = UUID.randomUUID();
         this.imgSource = imgSource;
         this.name = name;
         this.teacher = teacher;

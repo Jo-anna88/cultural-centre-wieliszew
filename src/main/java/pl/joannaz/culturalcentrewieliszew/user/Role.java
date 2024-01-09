@@ -5,3 +5,16 @@ public enum Role {
     Employee,
     Admin
 }
+
+/*
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Role {
+    @Id
+    @GeneratedValue(strategy=AUTO)
+    private Long id;
+    private String name;
+}
+ */

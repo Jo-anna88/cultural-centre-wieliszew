@@ -2,6 +2,7 @@ package pl.joannaz.culturalcentrewieliszew.course;
 
 
 import jakarta.persistence.Transient;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,7 @@ import java.util.UUID;
 import static pl.joannaz.culturalcentrewieliszew.utils.constants.SIMPLE_TEXT;
 
 @Service
+//@Slf4j
 public class CourseService {
 
     private final CourseRepository courseRepository;
@@ -23,15 +25,17 @@ public class CourseService {
     }
 
     public List<Course> getAllCourses() {
+        //log.info("Fetching all courses.");
         return courseRepository.findAll();
     }
 
-    public Course getCourseById(UUID id) {
+    public Course getCourseById(Long id) { // UUID
         //return new Course("assets/icons/ballet-shoes.png", "Ballet", "Anna Baletowicz", SIMPLE_TEXT);
         return courseRepository.findById(id).get();
     }
 
     public Course addCourse(Course course) {
+        //log.info("Saving new course: {} to the database", course.getName());
         return courseRepository.save(course);
     }
 
@@ -65,7 +69,7 @@ public class CourseService {
         //return new Course(courseRepository.save(originalCourse));
     }
 
-    public UUID deleteCourse(UUID id) {
+    public Long deleteCourse(Long id) { // UUID
         boolean exists = courseRepository.existsById(id);
         if (!exists) {
             throw new IllegalStateException("Such a course does not exist.");

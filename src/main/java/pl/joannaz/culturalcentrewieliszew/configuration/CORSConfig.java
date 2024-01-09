@@ -10,7 +10,8 @@ public class CORSConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
-                .allowedMethods("GET","POST","PUT","DELETE")
-                .allowedOrigins(devUrl);                        // <- it could be an app's property to easy swap out from dev to production Url
+                .allowedMethods("GET","POST","PUT","DELETE", "OPTIONS")
+                .allowedOrigins(devUrl)
+                .allowCredentials(true); // <- it could be an app's property to easy swap out from dev to production Url
     }
 }

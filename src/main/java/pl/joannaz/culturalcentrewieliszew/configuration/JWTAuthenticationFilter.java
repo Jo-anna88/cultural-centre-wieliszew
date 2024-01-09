@@ -13,7 +13,7 @@
 //
 //@Component
 //@RequiredArgsConstructor // constructor for private final fields
-//public class JWTAuthenticationFilter extends OncePerRequestFilter {
+//public class JWTAuthenticationFilter extends OncePerRequestFilter { //extends BasicAuthenticationFilter (BAF extends OncePerRequestFilter)
 //    private final JWTService jwtService;
 //
 //    @Override

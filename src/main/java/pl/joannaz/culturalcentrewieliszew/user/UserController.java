@@ -19,4 +19,11 @@ public class UserController {
         return userRepository.findAll().parallelStream().map(user -> new UserDTO(user)).collect(Collectors.toList());
     }
      */
+    /*
+    ***save a new user***
+    * Use a strong hashing algorithm like BCrypt *
+    String encodedPassword = passwordEncoder.encode(rawPassword);
+    user.setPassword(encodedPassword);
+    userRepository.save(user);
+     */
 }

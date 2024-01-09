@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface CourseRepository extends JpaRepository<Course, UUID> {
+public interface CourseRepository extends JpaRepository<Course, Long> {
 
     // 1. sposób: SELECT * FROM student WHERE name = ?
     // 2. sposób: @Query("SELECT c FROM Course c WHERE c.name = ?1")

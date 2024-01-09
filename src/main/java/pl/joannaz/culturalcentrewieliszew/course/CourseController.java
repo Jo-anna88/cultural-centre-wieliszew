@@ -34,8 +34,14 @@ public class CourseController {
         //return null;
     }
 
+    /*
+    public ResponseEntity<List<Course>> getAllCourses() {
+        return ResponseEntity.ok().body(courseService.getAllCourses());
+    }
+     */
+
     @GetMapping("/{id}")
-    public Course getCourseById(@PathVariable("id") UUID id) {
+    public Course getCourseById(@PathVariable("id") Long id) { // UUID id
         return courseService.getCourseById(id);
         //return courseRepository.findById(id).get();
     }
@@ -51,7 +57,7 @@ public class CourseController {
     }
 
     @DeleteMapping("/{id}")
-    public UUID deleteCourse(@PathVariable("id") UUID id) {
+    public Long deleteCourse(@PathVariable("id") Long id) { // UUID
         System.out.println("deleteCourse: " + id);
         return courseService.deleteCourse(id);
     }
