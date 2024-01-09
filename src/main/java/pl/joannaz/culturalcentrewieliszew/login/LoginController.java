@@ -9,10 +9,7 @@ import pl.joannaz.culturalcentrewieliszew.user.User;
 import pl.joannaz.culturalcentrewieliszew.user.UserService;
 
 import java.security.interfaces.RSAPrivateKey;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequestMapping(path = "/api/auth")
@@ -28,7 +25,21 @@ public class LoginController {
 
     @PostMapping(path="/login")
     public Map<String,String> login (@RequestBody Map<String,String> credentials) {
-        System.out.println(credentials);
+        //credentials - LinkedHashMap, keys: username and password
+        Optional<User> user = userService.findUserByUsername(credentials.get("username"));
+        if (user.isPresent()) {
+            if (passwordEncoder.matches(credentials.get("password"), user.get().getPassword())) {
+                System.out.println("Password is correct");
+                // Passwords match, proceed with authentication
+                // Create an Authentication object, set it in the SecurityContext, etc.
+            } else {
+                System.out.println("Password is incorrect");
+                // Error: Passwords do not match, handle unsuccessful login
+            }
+        } else {
+            // Error: User not found, handle unsuccessful login.
+            System.out.println("User not found. Please, try again with other username.");
+        }
         return credentials;
     }
 
@@ -38,7 +49,6 @@ public class LoginController {
         String encodedPassword = passwordEncoder.encode(newUser.getPassword());
         newUser.setPassword(encodedPassword);
         userService.addUser(newUser);
-        System.out.println(newUser);
         return newUser;
     }
 }
