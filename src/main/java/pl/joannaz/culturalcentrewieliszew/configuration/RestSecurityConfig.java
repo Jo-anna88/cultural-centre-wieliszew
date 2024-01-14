@@ -2,6 +2,7 @@ package pl.joannaz.culturalcentrewieliszew.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -20,11 +21,16 @@ public class RestSecurityConfig { // import org.springframework.security.config.
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable); // against method reference we could use lambda: (csrf -> csrf.disable())
-                //.authorizeHttpRequests((authz) -> authz
-                //        .anyRequest().authenticated()
-                //)
-                //.httpBasic(withDefaults());
+                .csrf(AbstractHttpConfigurer::disable) // against method reference we could use lambda: (csrf -> csrf.disable())
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers(HttpMethod.GET, "/api/classes/**")
+//                        .hasRole("CLIENT")
+//                )
+        ;
+//                .authorizeHttpRequests((authz) -> authz
+//                        .anyRequest().authenticated()
+//                )
+//                .httpBasic(withDefaults());
         return http.build();
     }
 
