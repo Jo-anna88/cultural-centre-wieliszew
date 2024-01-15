@@ -1,4 +1,4 @@
-package pl.joannaz.culturalcentrewieliszew.configuration;
+package pl.joannaz.culturalcentrewieliszew.security;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;

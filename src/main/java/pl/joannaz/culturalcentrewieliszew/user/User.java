@@ -1,12 +1,6 @@
 package pl.joannaz.culturalcentrewieliszew.user;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,7 +20,11 @@ import java.util.UUID;
 @Builder // to use Builder design pattern
 @NoArgsConstructor
 @AllArgsConstructor // needed for Builder
-@Table(name="_user")
+@Table(
+        name="users",
+        uniqueConstraints = {
+            @UniqueConstraint(columnNames = "username")
+        })
 @Entity(name="User")
 public class User implements UserDetails
 { // model (class called 'User' exists in PostgreSQL, so we should use other name
@@ -47,11 +45,24 @@ public class User implements UserDetails
     // or:
     // @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     // private Set<Authority> roles = new HashSet<>();
+    // or: //bezkoder//
+//    @ManyToMany(fetch = FetchType.LAZY)
+//    @JoinTable(name = "user_roles",
+//            joinColumns = @JoinColumn(name = "user_id"),
+//            inverseJoinColumns = @JoinColumn(name = "role_id"))
+//    private Set<Role> roles = new HashSet<>();
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
+    /*
+    for many roles: //bezkoder//
+        List<GrantedAuthority> authorities = user.getRoles().stream()
+        .map(role -> new SimpleGrantedAuthority(role.getName().name()))
+        .collect(Collectors.toList());
+     */
 
     @Override
     // it is done by Lombok, so maybe it is not needed
