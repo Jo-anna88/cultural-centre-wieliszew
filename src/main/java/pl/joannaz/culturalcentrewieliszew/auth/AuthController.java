@@ -1,5 +1,7 @@
 package pl.joannaz.culturalcentrewieliszew.auth;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -7,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,12 +36,13 @@ public class AuthController {
     private final String jwtCookieName = "jwt";
 
     @PostMapping(path="/login") // authenticate user
-    public ResponseEntity<UserDTO> login (@RequestBody Map<String,String> credentials) {
+    public UserDTO login (@RequestBody Map<String,String> credentials, HttpServletResponse response) {
         //credentials - LinkedHashMap, keys: username and password
         Authentication authentication = authManager
                 .authenticate(new UsernamePasswordAuthenticationToken(credentials.get("username"), credentials.get("password")));
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        SecurityContext sc = SecurityContextHolder.getContext();
+                sc.setAuthentication(authentication);
 
         User currentUser = (User) authentication.getPrincipal();
         // or just (against these three lines above): User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -48,14 +52,20 @@ public class AuthController {
 
         String token = jwtService.generateToken(username);
 
-        ResponseCookie jwtCookie = ResponseCookie.from(jwtCookieName, token)
-                .path("/api")
-                .maxAge(jwtService.getExpTimeMs()/1000) //the same as expiration time for jwt but in seconds against milliseconds
-                .httpOnly(true)
-                .build();
+//        ResponseCookie jwtCookie = ResponseCookie.from(jwtCookieName, token)
+//                .path("/api")
+//                .maxAge(jwtService.getExpTimeMs()/1000) //the same as expiration time for jwt but in seconds against milliseconds
+//                .httpOnly(true)
+//                .build();
+//
+//        ResponseEntity responseEntity = ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+//                .body(new UserDTO(currentUser));
+//
+//        return responseEntity;
 
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                .body(new UserDTO(currentUser));
+        response.addCookie(jwtService.generateJwtCookie(jwtCookieName, token));
+
+        return new UserDTO(currentUser);
         // WITHOUT SECURITY CONTEXT AND WITHOUT JWT
        /*
         Optional<User> user = userService.findUserByUsername(credentials.get("username"));

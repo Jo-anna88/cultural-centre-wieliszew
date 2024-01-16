@@ -2,6 +2,7 @@ package pl.joannaz.culturalcentrewieliszew.security.jwt;
 
 import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.Cookie;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,7 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.text.DateFormat;
 import java.time.LocalDate;
+import java.util.Base64;
 import java.util.Date;
 
 @Service
@@ -23,24 +25,36 @@ public class JWTService {
     private static final Logger logger = LoggerFactory.getLogger(JWTService.class);
     RSAPrivateKey privateKey;
     RSAPublicKey publicKey;
-    @Getter
     private long expTimeMs = 1800000; // 1800s, czyli 30 min. lub 86400000 ms, 86400 s, czyli 24h
 
     @PostConstruct
     private void initKeys() throws NoSuchAlgorithmException {
         KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
         generator.initialize(2048);
-        KeyPair keyPair = generator.generateKeyPair();
+        KeyPair keyPair = generator.genKeyPair();
         privateKey  = (RSAPrivateKey)keyPair.getPrivate();
         publicKey = (RSAPublicKey)keyPair.getPublic();
+        // for testing/debugging purposes:
+        String encodedPublicKey = Base64.getEncoder().encodeToString(publicKey.getEncoded());
+        String encodedPrivateKey = Base64.getEncoder().encodeToString(privateKey.getEncoded());
     }
     public String generateToken(String username) {
+        long currentTimeMs = System.currentTimeMillis();
         return Jwts.builder()
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expTimeMs))
+                .setIssuedAt(new Date(currentTimeMs))
+                .setExpiration(new Date(currentTimeMs + expTimeMs))
                 .claim("name", username)
                 .signWith(privateKey, SignatureAlgorithm.RS256)
                 .compact();
+    }
+
+    public Cookie generateJwtCookie(String cookieName, String cookieValue) {
+        Cookie jwtCookieTest = new Cookie(cookieName, cookieValue);
+        jwtCookieTest.setPath("/api");
+        jwtCookieTest.setMaxAge((int) (expTimeMs/1000));
+        jwtCookieTest.setHttpOnly(true);
+        //jwtCookieTest.setSecure(true); // in production
+        return jwtCookieTest;
     }
 
     public boolean validateJwtToken(String token) {
@@ -64,4 +78,6 @@ public class JWTService {
         return Jwts.parserBuilder().setSigningKey(publicKey).build()
                 .parseClaimsJws(token).getBody().get("name").toString();
     }
+
+
 }

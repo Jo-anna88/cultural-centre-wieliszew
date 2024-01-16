@@ -34,7 +34,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter { //extends Ba
 
         Cookie tokenCookie = null;
         for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("token")) {
+            if (cookie.getName().equals("jwt")) {
                 tokenCookie = cookie;
             }
         }
@@ -44,14 +44,15 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter { //extends Ba
             return;
         }
 
-        if (jwtService == null) {
-            ServletContext servletContext = request.getServletContext();
-            WebApplicationContext wac  = WebApplicationContextUtils.getWebApplicationContext(servletContext);
-          //  jwtService = wac.getBean(JWTService.class);
-        }
+//        if (jwtService == null) {
+//            ServletContext servletContext = request.getServletContext();
+//            WebApplicationContext wac  = WebApplicationContextUtils.getWebApplicationContext(servletContext);
+//            //jwtService = wac.getBean(JWTService.class);
+//        }
 
         //UsernamePasswordAuthenticationToken authentication = getAuthentication(tokenCookie.getValue());
         //SecurityContextHolder.getContext().setAuthentication(authentication);
+
         chain.doFilter(request, response);
     }
     //it should be fired every time there is a request to DB, that's why we use OncePerRequestFilter
