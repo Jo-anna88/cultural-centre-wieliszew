@@ -2,9 +2,10 @@ package pl.joannaz.culturalcentrewieliszew.auth;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
+import org.apache.coyote.Response;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,7 +34,8 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
     private final JWTService jwtService;
-    private final String jwtCookieName = "jwt";
+    @Value("${jwtCookieName}")
+    private String jwtCookieName; // = "jwt";
 
     @PostMapping(path="/login") // authenticate user
     public UserDTO login (@RequestBody Map<String,String> credentials, HttpServletResponse response) {
@@ -90,10 +92,24 @@ public class AuthController {
 
     @PostMapping(path="/signup") // id=null
     public UserDTO signup (@RequestBody User newUser) {
-        newUser.setId(UUID.randomUUID());
+        if (userService.existsByUsername(newUser.getUsername())) {
+            throw new Error("Username already exists.");
+            //return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
+        }
+        newUser.setId(UUID.randomUUID()); //is it needed?
         String encodedPassword = passwordEncoder.encode(newUser.getPassword());
         newUser.setPassword(encodedPassword);
         userService.addUser(newUser);
         return new UserDTO(newUser);
+    }
+
+    @PostMapping(path="/logout")
+    public void logout(HttpServletResponse response) {
+        response.addCookie(jwtService.cleanJwtCookie(jwtCookieName));
+        /*
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(new MessageResponse("You've been signed out!"));
+         */
+        SecurityContextHolder.getContext().setAuthentication(null); // z Udemy, brak na bezkoder
     }
 }

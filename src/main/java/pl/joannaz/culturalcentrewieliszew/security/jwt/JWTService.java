@@ -3,11 +3,14 @@ package pl.joannaz.culturalcentrewieliszew.security.jwt;
 import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.datasource.lookup.DataSourceLookupFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.WebUtils;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -26,6 +29,8 @@ public class JWTService {
     RSAPrivateKey privateKey;
     RSAPublicKey publicKey;
     private long expTimeMs = 1800000; // 1800s, czyli 30 min. lub 86400000 ms, 86400 s, czyli 24h
+    @Value("${jwtCookieName}")
+    private String jwtCookieName;
 
     @PostConstruct
     private void initKeys() throws NoSuchAlgorithmException {
@@ -49,14 +54,24 @@ public class JWTService {
     }
 
     public Cookie generateJwtCookie(String cookieName, String cookieValue) {
-        Cookie jwtCookieTest = new Cookie(cookieName, cookieValue);
-        jwtCookieTest.setPath("/api");
-        jwtCookieTest.setMaxAge((int) (expTimeMs/1000));
-        jwtCookieTest.setHttpOnly(true);
-        //jwtCookieTest.setSecure(true); // in production
-        return jwtCookieTest;
+        Cookie jwtCookie = new Cookie(cookieName, cookieValue);
+        jwtCookie.setPath("/api");
+        jwtCookie.setMaxAge((int) (expTimeMs/1000));
+        jwtCookie.setHttpOnly(true);
+        //jwtCookie.setSecure(true); // in production
+        return jwtCookie;
     }
 
+    public Cookie cleanJwtCookie(String cookieName) {
+        Cookie jwtCookie = new Cookie(cookieName, null);
+        jwtCookie.setPath("/api");
+        // jwtCookie.setHttpOnly(true);
+        // jwtCookie.setSecure(true); // in production
+        // jwtCookie.setMaxAge(0);
+        return jwtCookie;
+    }
+
+    // token validation from bezkoder:
     public boolean validateJwtToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(publicKey).build().parse(token);
@@ -74,10 +89,25 @@ public class JWTService {
         return false;
     }
 
+    /* token validation from Udemy:
+    public String validateToken(String token) throws JWTVerificationException {
+
+        String encodedPayload = JWT.require(Algorithm.RSA256(publicKey, privateKey))
+                .build()
+                .verify(token)
+                .getPayload();
+
+        return new String(Base64.getDecoder().decode(encodedPayload));
+    }
+    */
+
     public String extractUsernameFromToken(String token) {
         return Jwts.parserBuilder().setSigningKey(publicKey).build()
                 .parseClaimsJws(token).getBody().get("name").toString();
     }
 
-
+    public String getJwtCookieValue(HttpServletRequest request) {
+        Cookie cookie = WebUtils.getCookie(request, jwtCookieName);
+        return (cookie != null) ? cookie.getValue() : null;
+    }
 }

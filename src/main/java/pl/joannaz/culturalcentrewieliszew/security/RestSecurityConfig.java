@@ -43,7 +43,7 @@ public class RestSecurityConfig { // import org.springframework.security.config.
 
     @Bean
     public JWTAuthenticationFilter jwtAuthenticationFilter() {
-        return new JWTAuthenticationFilter(jwtService);
+        return new JWTAuthenticationFilter(jwtService, userService);
     }
 
     @Bean

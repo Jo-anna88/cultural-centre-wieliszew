@@ -20,7 +20,7 @@ public class UserService implements UserDetailsService { //interface UserService
         return this.userRepository.save(user);
     }
     public Optional<User> findUserByUsername(String username) {return this.userRepository.findByUsername(username);}
-
+    public boolean existsByUsername(String username) {return this.userRepository.existsByUsername(username);}
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return this.userRepository.findByUsername(username)
