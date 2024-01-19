@@ -47,7 +47,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter { //extends Ba
             UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(currentUser, null, currentUser.getAuthorities());
 
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request)); // is it needed? tylko na bezkoder, brak na Udemy
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request)); // is it needed? tylko na bezkoder, brak na Udemy (dodaje 'details'(remoteAddress' i 'sessionId'=null do 'authentication')
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }

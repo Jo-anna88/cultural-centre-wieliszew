@@ -11,7 +11,7 @@ public class CORSConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
                 .allowedMethods("GET","POST","PUT","DELETE", "OPTIONS")
-                .allowedOrigins(devUrl)
-                .allowCredentials(true); // <- it could be an app's property to easy swap out from dev to production Url
+                .allowedOrigins(devUrl) // <- it could be an app's property to easy swap out from dev to production Url
+                .allowCredentials(true);
     }
 }
