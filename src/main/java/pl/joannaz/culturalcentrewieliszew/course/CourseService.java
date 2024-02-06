@@ -6,10 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static pl.joannaz.culturalcentrewieliszew.utils.constants.SIMPLE_TEXT;
 
@@ -18,10 +15,12 @@ import static pl.joannaz.culturalcentrewieliszew.utils.constants.SIMPLE_TEXT;
 public class CourseService {
 
     private final CourseRepository courseRepository;
+    private final CourseDetailsRepository detailsRepository;
 
     //@Autowired
-    public CourseService (CourseRepository courseRepository) {
+    public CourseService (CourseRepository courseRepository, CourseDetailsRepository detailsRepository) {
         this.courseRepository = courseRepository;
+        this.detailsRepository = detailsRepository;
     }
 
     public List<Course> getAllCourses() {
@@ -32,6 +31,12 @@ public class CourseService {
     public Course getCourseById(Long id) { // UUID
         //return new Course("assets/icons/ballet-shoes.png", "Ballet", "Anna Baletowicz", SIMPLE_TEXT);
         return courseRepository.findById(id).get();
+    }
+
+    public CourseDetails getDetailsById (Long id) {
+        boolean detailsExists = detailsRepository.existsById(id);
+        // throw new NoSuchElementException("");
+        return detailsExists ? detailsRepository.findById(id).get() : null;
     }
 
     public Course addCourse(Course course) {
@@ -74,7 +79,42 @@ public class CourseService {
         if (!exists) {
             throw new IllegalStateException("Such a course does not exist.");
         }
+
+        boolean detailsExist = detailsRepository.existsById(id);
+        if (detailsExist) {
+            detailsRepository.deleteById(id);
+        }
+
         courseRepository.deleteById(id);
+        return id;
+    }
+
+    public CourseDetails addCourseDetails(CourseDetails courseDetails) {
+        return detailsRepository.save(courseDetails);
+    }
+
+    public CourseDetails updateCourseDetails(CourseDetails updatedCourseDetails) {
+        CourseDetails originalCourseDetails = detailsRepository.findById(updatedCourseDetails.getId())
+                .orElseThrow(() -> new IllegalStateException(
+                        "Course Details with this id does not exist."
+                ));
+//        originalCourseDetails.setMinAge(updatedCourseDetails.getMinAge());
+//        originalCourseDetails.setMaxAge(updatedCourseDetails.getMaxAge());
+//        originalCourseDetails.setPrice(updatedCourseDetails.getPrice());
+//        originalCourseDetails.setMaxParticipantsNumber(updatedCourseDetails.getMaxParticipantsNumber());
+//        originalCourseDetails.setLessonDurationMinutes(updatedCourseDetails.getLessonDurationMinutes());
+//        originalCourseDetails.setDate(updatedCourseDetails.getDate());
+//        originalCourseDetails.setRoomId(updatedCourseDetails.getRoomId());
+        originalCourseDetails.update(updatedCourseDetails);
+        return detailsRepository.save(originalCourseDetails);
+    }
+
+    public Long deleteCourseDetails(Long id) {
+        boolean detailsExist = detailsRepository.existsById(id);
+        if (!detailsExist) {
+            throw new IllegalStateException("Course details do not exist.");
+        }
+        detailsRepository.deleteById(id);
         return id;
     }
 }

@@ -37,8 +37,8 @@ public class User implements UserDetails
     private String phone;
     private String username; // e.g. email, login
     private String password;
-    @Enumerated(EnumType.STRING) // it tells Spring Boot that it is enum
-    private Role role; // here user can have only one role
+    @Enumerated(EnumType.STRING)
+    private Role role; // in this app user can have only one role
     // or:
     // @ManyToMany(fetch = FetchType.EAGER)
     // Collection<Role> roles = new ArrayList<>(); // 'eager' because we want to load all the roles whenever we load the user

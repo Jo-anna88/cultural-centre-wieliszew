@@ -59,6 +59,7 @@ public class RestSecurityConfig { // import org.springframework.security.config.
                 .csrf(AbstractHttpConfigurer::disable) // against method reference we could use lambda: (csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // we want to re-authenticate the user on every request
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/classes/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/contact").permitAll()

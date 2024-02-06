@@ -1,15 +1,10 @@
 package pl.joannaz.culturalcentrewieliszew.course;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import com.fasterxml.jackson.annotation.*;
+import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 /*
 @Table(
@@ -19,6 +14,10 @@ import java.util.UUID;
 @Table(name="course")
 @Entity(name="Course")
 @Data
+//@JsonIgnoreProperties({"hibernateLazyInitializer"}) // for unidirectional association for api/classes/{id}/details if we want to have course object nested in course details
+//@JsonIdentityInfo( // for Bi-directional @OneToOne association (to remove recursion in JSON mapper)
+//        generator = ObjectIdGenerators.PropertyGenerator.class,
+//        property = "id")
 public class Course {
     @Id
     //@GeneratedValue(strategy = GenerationType.UUID)
@@ -37,11 +36,13 @@ public class Course {
          updatable = false
     )
     private Long id;
+
     @Column(
             name="img_source",
             columnDefinition = "TEXT"
     )
     private String imgSource;
+
     @Column(
             name="name",
             nullable = false,
@@ -49,13 +50,27 @@ public class Course {
             unique = true
     )
     private String name;
-    private String teacher;
+
+    private String teacher; // user_id that is a teacher (position)
+
     @Column(
             name="description",
             nullable = false,
             columnDefinition = "TEXT"
     )
     private String description;
+
+    @Enumerated(EnumType.STRING)
+    private Category category;
+
+//    @JsonIgnore // for Bi-directional @OneToOne association (to remove data about courseDetails during sending to frontend course object)
+//    @OneToOne( // for Bi-directional @OneToOne association
+//            mappedBy = "course",
+//            cascade = CascadeType.ALL,
+//            orphanRemoval = true,
+//            fetch = FetchType.LAZY
+//    )
+//    private CourseDetails courseDetails;
 
     public Course() {}
     public Course(String imgSource, String name, String teacher, String description) {
@@ -64,13 +79,42 @@ public class Course {
         this.name = name;
         this.teacher = teacher;
         this.description = description;
+        this.category = Category.OTHER; // default
+    }
+    public Course(String imgSource, String name, String teacher, String description, Category category) {
+        this(imgSource, name, teacher, description);
+        this.category = category;
     }
 
+    // for Bi-directional @OneToOne association:
+//    public Course(String imgSource, String name, String teacher, String description, Category category, CourseDetails courseDetails) {
+//        this(imgSource, name, teacher, description, category);
+//        this.addDetails(courseDetails);
+//    }
+
     public Course(Course originalCourse) {
+        this(
+                originalCourse.imgSource,
+                originalCourse.name,
+                originalCourse.teacher,
+                originalCourse.description,
+                originalCourse.category
+        );
         this.id = originalCourse.id;
-        this.imgSource = originalCourse.imgSource;
-        this.name = originalCourse.name;
-        this.teacher = originalCourse.teacher;
-        this.description = originalCourse.description;
     }
+
+    // for Bi-directional @OneToOne association:
+//    public void addDetails(CourseDetails courseDetails) {
+//        courseDetails.setCourse(this);
+//        this.courseDetails = courseDetails;
+//    }
+//
+//    public void removeDetails() {
+//        if (courseDetails != null) {
+//            courseDetails.setCourse(null);
+//            this.courseDetails = null;
+//        }
+//    }
 }
+
+
