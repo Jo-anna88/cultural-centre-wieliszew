@@ -69,6 +69,8 @@ public class CourseService {
         originalCourse.setImgSource(updatedCourse.getImgSource());
         // if...
         originalCourse.setTeacher(updatedCourse.getTeacher());
+        // if...
+        originalCourse.setCategory(updatedCourse.getCategory());
         return courseRepository.save(originalCourse);
         //return originalCourse; //because we use @Transactional we can use setters against methods from repository
         //return new Course(courseRepository.save(originalCourse));
@@ -90,6 +92,11 @@ public class CourseService {
     }
 
     public CourseDetails addCourseDetails(CourseDetails courseDetails) {
+        Course course = courseRepository.findById(courseDetails.getId())
+                .orElseThrow(() -> new IllegalStateException(
+                        "Course Details with this id does not exist."
+                ));
+        courseDetails.setCourse(course);
         return detailsRepository.save(courseDetails);
     }
 
