@@ -5,7 +5,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService implements UserDetailsService { //interface UserService ?
@@ -25,5 +27,18 @@ public class UserService implements UserDetailsService { //interface UserService
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return this.userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found in the database."));
+    }
+    public List<User> getChildren(UUID userId) {
+        return userRepository.findByParentId(userId);
+    }
+    public User addChild(UUID parentId, User childUser) {
+        // Retrieve the parent user
+        if (!userRepository.existsById(parentId)) {
+            throw new RuntimeException("Parent user not found");
+        }
+        // Set the parent ID for the child user
+        childUser.setParentId(parentId);
+        // Save the child user
+        return userRepository.save(childUser);
     }
 }

@@ -63,6 +63,7 @@ public class RestSecurityConfig { // import org.springframework.security.config.
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/classes/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/contact").permitAll()
+                        .requestMatchers("/api/user/**").permitAll() // just for testing
                         //.requestMatchers(HttpMethod.GET, "/api/test/client").hasRole("CLIENT")
                         .requestMatchers(HttpMethod.GET, "/api/test/employee").hasRole("EMPLOYEE")
                         .requestMatchers(HttpMethod.GET, "/api/test/admin").hasRole("ADMIN")

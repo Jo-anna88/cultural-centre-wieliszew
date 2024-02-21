@@ -32,6 +32,7 @@ public class User implements UserDetails
     @Id
     @GeneratedValue(strategy= GenerationType.UUID)
     private UUID id;
+    private UUID parentId; // for relation with subaccounts
     private String firstName;
     private String lastName;
     private String phone;

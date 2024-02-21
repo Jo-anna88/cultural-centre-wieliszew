@@ -29,7 +29,6 @@ import java.util.*;
 @RequestMapping(path = "/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    private int PRIVATE_KEY = 123;
     private final AuthenticationManager authManager;
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
