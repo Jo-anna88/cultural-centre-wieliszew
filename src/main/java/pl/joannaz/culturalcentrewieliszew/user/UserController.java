@@ -1,10 +1,13 @@
 package pl.joannaz.culturalcentrewieliszew.user;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequestMapping(path="/api/user")
@@ -42,5 +45,31 @@ public class UserController {
     public UserDTO addChild(@PathVariable UUID id, @RequestBody User child) {
         User newChild = userService.addChild(id, child); // id will be automatically added
         return new UserDTO(newChild);
+    }
+
+    @GetMapping("/profile")
+    public UserDTO getUserProfile() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        // Check if the authentication object is not null and is an instance of UserDetails
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+            // Cast the principal to User
+            return new UserDTO((User) authentication.getPrincipal());
+        }
+        throw new RuntimeException("cannot get current user's profile");
+    }
+
+    @GetMapping("/userBasicData") // user name and surname
+    public String getUserNameAndSurname() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser;
+        // Check if the authentication object is not null and is an instance of UserDetails
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+            // Cast the principal to User
+            currentUser = (User) authentication.getPrincipal();
+            String userNameAndSurname = "{\"firstName\":\"" + currentUser.getFirstName() + "\",\"lastName\":\"" + currentUser.getLastName() + "\"}";
+            return userNameAndSurname;
+        }
+        throw new RuntimeException("cannot get current user's name and surname");
     }
 }

@@ -10,13 +10,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.joannaz.culturalcentrewieliszew.security.jwt.JWTService;
 import pl.joannaz.culturalcentrewieliszew.user.Role;
 import pl.joannaz.culturalcentrewieliszew.user.User;
@@ -110,5 +109,23 @@ public class AuthController {
                 .body(new MessageResponse("You've been signed out!"));
          */
         SecurityContextHolder.getContext().setAuthentication(null); // z Udemy, brak na bezkoder
+    }
+
+    @GetMapping("/role")
+    public Map<String,String> getUserRole() {
+        Collection<? extends GrantedAuthority> roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        String role = ""; // if user is not authenticated, it has no role, so this method's response will be this empty string
+        if (!roles.isEmpty()) {
+            SimpleGrantedAuthority sga = (SimpleGrantedAuthority) roles.iterator().next();
+            role = sga.getAuthority().substring(5);
+        }
+        Map<String, String> response = new HashMap<>();
+        response.put("role", role);
+        return response;
+    }
+
+    @GetMapping("/status")
+    public boolean getIsAuthenticated() {
+        return SecurityContextHolder.getContext().getAuthentication().isAuthenticated();
     }
 }
