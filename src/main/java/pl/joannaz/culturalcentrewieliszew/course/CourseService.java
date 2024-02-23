@@ -30,13 +30,13 @@ public class CourseService {
 
     public Course getCourseById(Long id) { // UUID
         //return new Course("assets/icons/ballet-shoes.png", "Ballet", "Anna Baletowicz", SIMPLE_TEXT);
-        return courseRepository.findById(id).get();
+        return courseRepository.findById(id).get(); // todo: check isPresent() (not return null!)
     }
 
     public CourseDetails getDetailsById (Long id) {
         boolean detailsExists = detailsRepository.existsById(id);
         // throw new NoSuchElementException("");
-        return detailsExists ? detailsRepository.findById(id).get() : null;
+        return detailsExists ? detailsRepository.findById(id).get() : null; // todo: check isPresent() (not return null!)
     }
 
     public Course addCourse(Course course) {

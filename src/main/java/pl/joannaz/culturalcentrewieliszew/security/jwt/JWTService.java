@@ -65,9 +65,9 @@ public class JWTService {
     public Cookie cleanJwtCookie(String cookieName) {
         Cookie jwtCookie = new Cookie(cookieName, null);
         jwtCookie.setPath("/api");
-        // jwtCookie.setHttpOnly(true);
+        jwtCookie.setMaxAge(0);
+        jwtCookie.setHttpOnly(true);
         // jwtCookie.setSecure(true); // in production
-        // jwtCookie.setMaxAge(0);
         return jwtCookie;
     }
 

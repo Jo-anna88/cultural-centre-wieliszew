@@ -117,15 +117,24 @@ public class AuthController {
         String role = ""; // if user is not authenticated, it has no role, so this method's response will be this empty string
         if (!roles.isEmpty()) {
             SimpleGrantedAuthority sga = (SimpleGrantedAuthority) roles.iterator().next();
-            role = sga.getAuthority().substring(5);
+            String authRole = sga.getAuthority().substring(5);
+            if (!authRole.equals("ANONYMOUS")) role = authRole;
         }
-        Map<String, String> response = new HashMap<>();
+        Map<String, String> response = new HashMap<>(1);
         response.put("role", role);
         return response;
     }
 
     @GetMapping("/status")
-    public boolean getIsAuthenticated() {
-        return SecurityContextHolder.getContext().getAuthentication().isAuthenticated();
+    public Map<String,Boolean> getIsAuthenticated() {
+        Map<String,Boolean> response = new HashMap<>(1);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() != "anonymousUser")
+            {
+                response.put("result", authentication.isAuthenticated());
+                return response;
+            }
+        response.put("result", false);
+        return response;
     }
 }

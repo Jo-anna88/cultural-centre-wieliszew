@@ -28,8 +28,8 @@ public class UserService implements UserDetailsService { //interface UserService
         return this.userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found in the database."));
     }
-    public List<User> getChildren(UUID userId) {
-        return userRepository.findByParentId(userId);
+    public List<User> getChildren(UUID parentId) {
+        return userRepository.findByParentId(parentId);
     }
     public User addChild(UUID parentId, User childUser) {
         // Retrieve the parent user
@@ -40,5 +40,24 @@ public class UserService implements UserDetailsService { //interface UserService
         childUser.setParentId(parentId);
         // Save the child user
         return userRepository.save(childUser);
+    }
+
+    public User updateChild (User updatedChild) {
+        User originalChild = userRepository.findById(updatedChild.getId())
+                .orElseThrow(() -> new IllegalStateException(
+                        "Child with this id does not exist."
+                ));
+        originalChild.setFirstName(updatedChild.getFirstName());
+        originalChild.setLastName(updatedChild.getLastName());
+        originalChild.setPhone(updatedChild.getPhone());
+        return userRepository.save(originalChild);
+    }
+
+    public User getChild (UUID childId) {
+        return userRepository.findById(childId).get(); // todo: check isPresent()
+    }
+
+    public void deleteChild (UUID childId) {
+        userRepository.deleteById(childId); // todo: courses list should be deleted too
     }
 }

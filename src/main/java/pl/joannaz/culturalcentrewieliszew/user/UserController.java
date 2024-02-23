@@ -32,19 +32,44 @@ public class UserController {
     user.setPassword(encodedPassword);
     userRepository.save(user);
      */
-    @GetMapping("/{id}/children")
-    public List<UserDTO> getChildrenByParentId(@PathVariable("id") UUID id) {
-        List<User> children = userService.getChildren(id);
-        List<UserDTO> childrenDTO = new ArrayList<>(children.size());
-        for (User child : children) {
-            childrenDTO.add(new UserDTO(child));
+    @GetMapping("/children")
+    public List<UserDTO> getChildrenByParentId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+            UUID parentId = ((User) authentication.getPrincipal()).getId();
+            List<User> children = userService.getChildren(parentId);
+            List<UserDTO> childrenDTO = new ArrayList<>(children.size());
+            for (User child : children) {
+                childrenDTO.add(new UserDTO(child));
+            }
+            return childrenDTO;
         }
-        return childrenDTO;
+        throw new RuntimeException("cannot get list of children");
     }
-    @PostMapping("/{id}")
-    public UserDTO addChild(@PathVariable UUID id, @RequestBody User child) {
-        User newChild = userService.addChild(id, child); // id will be automatically added
-        return new UserDTO(newChild);
+    @PostMapping("/child")
+    public UserDTO addChild(@RequestBody User child) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+            UUID parentId = ((User) authentication.getPrincipal()).getId();
+            User newChild = userService.addChild(parentId, child);
+            return new UserDTO(newChild);
+        }
+        throw new RuntimeException("cannot add a child");
+    }
+
+    @PutMapping("/child")
+    public UserDTO updateChild(@RequestBody User child) {
+        return new UserDTO(userService.updateChild(child));
+    }
+
+    @DeleteMapping("/child/{id}")
+    public void deleteChild(@PathVariable("id") UUID id) {
+        userService.deleteChild(id);
+    }
+
+    @GetMapping("child/{id}")
+    public UserDTO getChild(@PathVariable("id") UUID id) {
+        return new UserDTO(userService.getChild(id));
     }
 
     @GetMapping("/profile")
@@ -59,16 +84,18 @@ public class UserController {
         throw new RuntimeException("cannot get current user's profile");
     }
 
-    @GetMapping("/userBasicData") // user name and surname
-    public String getUserNameAndSurname() {
+    @GetMapping("/user-basic-data") // user name and surname
+    public Map<String,String> getUserNameAndSurname() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser;
         // Check if the authentication object is not null and is an instance of UserDetails
         if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
             // Cast the principal to User
             currentUser = (User) authentication.getPrincipal();
-            String userNameAndSurname = "{\"firstName\":\"" + currentUser.getFirstName() + "\",\"lastName\":\"" + currentUser.getLastName() + "\"}";
-            return userNameAndSurname;
+            Map<String,String> response = new HashMap<>(2);
+            response.put("firstName", currentUser.getFirstName());
+            response.put("lastName", currentUser.getLastName());
+            return response;
         }
         throw new RuntimeException("cannot get current user's name and surname");
     }

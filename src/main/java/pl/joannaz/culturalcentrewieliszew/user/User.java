@@ -53,6 +53,10 @@ public class User implements UserDetails
 //            inverseJoinColumns = @JoinColumn(name = "role_id"))
 //    private Set<Role> roles = new HashSet<>();
 
+//    @ManyToMany
+//    private Set<Course> courses = new HashSet<>();
+//    @ManyToMany
+//    private Set<CulturalEvent> culturalEvents = new HashSet<>()
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
