@@ -3,8 +3,11 @@ package pl.joannaz.culturalcentrewieliszew.course;
 import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.Data;
+import pl.joannaz.culturalcentrewieliszew.linkEntities.UserCourse;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 /*
 @Table(
@@ -14,13 +17,12 @@ import java.util.UUID;
 @Table(name="course")
 @Entity(name="Course")
 @Data
-//@JsonIgnoreProperties({"hibernateLazyInitializer"}) // for unidirectional association for api/classes/{id}/details if we want to have course object nested in course details
-//@JsonIdentityInfo( // for Bi-directional @OneToOne association (to remove recursion in JSON mapper)
+//@JsonIgnoreProperties({"hibernateLazyInitializer"}) // for Unidirectional association for api/classes/{id}/details if we want to have course object nested in course details
+//@JsonIdentityInfo( // for Bi-directional @OneToOne/@ManyToMany association (to remove recursion in JSON mapper)
 //        generator = ObjectIdGenerators.PropertyGenerator.class,
 //        property = "id")
 public class Course {
     @Id
-    //@GeneratedValue(strategy = GenerationType.UUID)
     @GeneratedValue(strategy = GenerationType.AUTO)
     /*
     @SequenceGenerator(
@@ -62,6 +64,15 @@ public class Course {
 
     @Enumerated(EnumType.STRING)
     private Category category;
+
+    @OneToMany(
+            mappedBy = "course",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    //@JsonIgnoreProperties("course")
+    //@JsonManagedReference
+    private List<UserCourse> participants = new ArrayList<>();
 
 //    @JsonIgnore // for Bi-directional @OneToOne association (to remove data about courseDetails during sending to frontend course object)
 //    @OneToOne( // for Bi-directional @OneToOne association

@@ -1,11 +1,10 @@
 package pl.joannaz.culturalcentrewieliszew.user;
 
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import pl.joannaz.culturalcentrewieliszew.course.Course;
 
 import java.util.*;
 
@@ -77,6 +76,7 @@ public class UserController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         // Check if the authentication object is not null and is an instance of UserDetails
+        //if(!(authentication instanceof AnonymousAuthenticationToken))
         if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
             // Cast the principal to User
             return new UserDTO((User) authentication.getPrincipal());
@@ -84,11 +84,12 @@ public class UserController {
         throw new RuntimeException("cannot get current user's profile");
     }
 
-    @GetMapping("/user-basic-data") // user name and surname
-    public Map<String,String> getUserNameAndSurname() {
+    @GetMapping("/user-basic-data") // user's full name // todo: full-name could be returned as a result of login
+    public Map<String,String> getFullName() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser;
         // Check if the authentication object is not null and is an instance of UserDetails
+        //if(!(authentication instanceof AnonymousAuthenticationToken))
         if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
             // Cast the principal to User
             currentUser = (User) authentication.getPrincipal();
@@ -98,5 +99,16 @@ public class UserController {
             return response;
         }
         throw new RuntimeException("cannot get current user's name and surname");
+    }
+
+    @GetMapping("/courses")
+    public List<Course> getCourses() {
+        User currentUser = userService.getCurrentUser();
+        return userService.getCoursesForUser(currentUser.getId());
+    }
+
+    @PostMapping("/join-course/{courseId}")
+    public void joinCourse(@PathVariable("courseId") Long courseId) {
+        userService.addCourse(courseId);
     }
 }

@@ -118,7 +118,7 @@ public class AuthController {
         if (!roles.isEmpty()) {
             SimpleGrantedAuthority sga = (SimpleGrantedAuthority) roles.iterator().next();
             String authRole = sga.getAuthority().substring(5);
-            if (!authRole.equals("ANONYMOUS")) role = authRole;
+            if (!authRole.equals("ANONYMOUS")) role = authRole; // when authentication is instanceof AnonymousAuthenticationToken
         }
         Map<String, String> response = new HashMap<>(1);
         response.put("role", role);

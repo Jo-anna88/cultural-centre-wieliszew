@@ -31,7 +31,6 @@ public class CourseDetails {
     @MapsId
     @JsonIgnore
     private Course course;
-    //private lista uczestników, czyli odwołanie do tabeli pośredniej (bo tu jest relacja many-to-many względem User)
 
     public CourseDetails(int maxParticipantsNumber, BigDecimal price, int roomId, int lessonDurationMinutes, int minAge, int maxAge, String date) {
         this.maxParticipantsNumber = maxParticipantsNumber;

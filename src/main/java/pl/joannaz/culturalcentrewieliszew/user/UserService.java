@@ -1,20 +1,29 @@
 package pl.joannaz.culturalcentrewieliszew.user;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import pl.joannaz.culturalcentrewieliszew.course.Course;
+import pl.joannaz.culturalcentrewieliszew.course.CourseRepository;
+import pl.joannaz.culturalcentrewieliszew.linkEntities.UserCourse;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService implements UserDetailsService { //interface UserService ?
     private final UserRepository userRepository;
+    private final CourseRepository courseRepository;
 
-    public UserService (UserRepository userRepository) {
+    public UserService (UserRepository userRepository, CourseRepository courseRepository) {
         this.userRepository = userRepository;
+        this.courseRepository = courseRepository;
     }
     //private final User user;
     //User saveUser(User user); ?
@@ -59,5 +68,33 @@ public class UserService implements UserDetailsService { //interface UserService
 
     public void deleteChild (UUID childId) {
         userRepository.deleteById(childId); // todo: courses list should be deleted too
+    }
+
+    public User getCurrentUser() {
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+    }
+
+    public List<Course> getCoursesForUser(UUID userId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            List<UserCourse> userCourses = user.getCourses();
+            return userCourses.stream()
+                    .map(UserCourse::getCourse)
+                    .collect(Collectors.toList());
+        } else {
+            // todo: Handle the case where user with the given ID is not found
+            return Collections.emptyList();
+        }
+    }
+
+    @Transactional
+    public void addCourse(Long courseId) {
+        Optional<Course> optionalCourse = this.courseRepository.findById(courseId);
+        if(optionalCourse.isPresent()) {
+            User currentUser = getCurrentUser();
+            currentUser.addCourse(optionalCourse.get());
+        }
     }
 }

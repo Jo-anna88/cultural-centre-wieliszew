@@ -5,8 +5,10 @@ import jakarta.persistence.Transient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pl.joannaz.culturalcentrewieliszew.linkEntities.UserCourse;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static pl.joannaz.culturalcentrewieliszew.utils.constants.SIMPLE_TEXT;
 
@@ -123,5 +125,20 @@ public class CourseService {
         }
         detailsRepository.deleteById(id);
         return id;
+    }
+
+    public List<String> getParticipantsByCourseId(Long id) {
+        Optional<Course> optionalCourse = courseRepository.findById(id);
+        if (optionalCourse.isPresent()) {
+            Course course = optionalCourse.get();
+            List<UserCourse> userCourses = course.getParticipants();
+            return userCourses.stream()
+                    .map(UserCourse::getParticipant)
+                    .map(user -> user.getFirstName() + " " + user.getLastName()) // Map User to UserDTO using constructor reference
+                    .collect(Collectors.toList());
+        } else {
+            // todo: Handle the case where user with the given ID is not found
+            return Collections.emptyList();
+        }
     }
 }
