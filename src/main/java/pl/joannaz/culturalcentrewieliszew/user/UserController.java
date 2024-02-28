@@ -84,7 +84,7 @@ public class UserController {
         throw new RuntimeException("cannot get current user's profile");
     }
 
-    @GetMapping("/user-basic-data") // user's full name // todo: full-name could be returned as a result of login
+    @GetMapping("/full-name") // user's full name // todo: full-name could be returned as a result of login
     public Map<String,String> getFullName() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser;
