@@ -1,15 +1,9 @@
 package pl.joannaz.culturalcentrewieliszew.course;
 
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -24,7 +18,7 @@ public class CourseController {
     }
 
     @GetMapping
-    public List<Course> getAllCourses(HttpServletResponse response) throws InterruptedException {
+    public List<CourseDTO> getAllCourses(HttpServletResponse response) throws InterruptedException {
          //Thread.sleep(3000); // to check dealing with slow REST responses
         return courseService.getAllCourses();
         //response.setStatus(500);
@@ -38,7 +32,7 @@ public class CourseController {
      */
 
     @GetMapping("/{id}")
-    public Course getCourseById(@PathVariable("id") Long id) { // UUID id
+    public CourseDTO getCourseById(@PathVariable("id") Long id) { // UUID id
         return courseService.getCourseById(id);
         //return courseRepository.findById(id).get();
     }
@@ -85,4 +79,16 @@ public class CourseController {
     public List<String> getParticipantsByCourseId(@PathVariable("id") Long id) {
         return courseService.getParticipantsByCourseId(id);
     }
+
+    @GetMapping("/search")
+    public List<Course> searchCourses(
+            @RequestParam(required = false) Integer minAge,
+            @RequestParam(required = false) Integer maxAge,
+            @RequestParam(required = false) BigDecimal price,
+            @RequestParam(required = false) String teacher,
+            @RequestParam(required = false) Category category,
+            @RequestParam(required = false) String name) {
+        return courseService.findCoursesByCriteria(minAge, maxAge, price, teacher, category, name);
+    }
+
 }

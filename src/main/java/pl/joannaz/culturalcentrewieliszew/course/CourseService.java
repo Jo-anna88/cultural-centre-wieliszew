@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.joannaz.culturalcentrewieliszew.linkEntities.UserCourse;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,14 +26,18 @@ public class CourseService {
         this.detailsRepository = detailsRepository;
     }
 
-    public List<Course> getAllCourses() {
+    public List<CourseDTO> getAllCourses() {
         //log.info("Fetching all courses.");
-        return courseRepository.findAll();
+        return courseRepository.findAll().stream().map(CourseDTO::new).collect(Collectors.toList());
     }
 
-    public Course getCourseById(Long id) { // UUID
+    public CourseDTO getCourseById(Long id) { // UUID
         //return new Course("assets/icons/ballet-shoes.png", "Ballet", "Anna Baletowicz", SIMPLE_TEXT);
-        return courseRepository.findById(id).get(); // todo: check isPresent() (not return null!)
+        Optional<Course> optionalCourse = courseRepository.findById(id);
+        if (optionalCourse.isPresent()) {
+            return new CourseDTO(optionalCourse.get());
+        }
+        throw new RuntimeException("cannot get a course with id: " + id);
     }
 
     public CourseDetails getDetailsById (Long id) {
@@ -140,5 +145,9 @@ public class CourseService {
             // todo: Handle the case where user with the given ID is not found
             return Collections.emptyList();
         }
+    }
+
+    public List<Course> findCoursesByCriteria(Integer minAge, Integer maxAge, BigDecimal price, String teacher, Category category, String name) {
+        return courseRepository.findCoursesByCriteria(minAge, maxAge, price, teacher, category, name);
     }
 }
