@@ -13,11 +13,11 @@ import pl.joannaz.culturalcentrewieliszew.user.User;
 public class UserCourse {
     @Id
     @ManyToOne
-    @JsonBackReference
+    @JsonBackReference(value="user-course")
     private User participant;
 
     @Id
     @ManyToOne
-    @JsonBackReference
+    @JsonBackReference(value="course-user")
     private Course course;
 }

@@ -46,9 +46,9 @@ public class CourseService {
         return detailsExists ? detailsRepository.findById(id).get() : null; // todo: check isPresent() (not return null!)
     }
 
-    public Course addCourse(Course course) {
+    public CourseDTO addCourse(Course course) {
         //log.info("Saving new course: {} to the database", course.getName());
-        return courseRepository.save(course);
+        return new CourseDTO(courseRepository.save(course));
     }
 
     public void addAllCourses(List<Course> courses) {
@@ -60,8 +60,8 @@ public class CourseService {
     public Course updateCourse(Course updatedCourse) {
         Course originalCourse = courseRepository.findById(updatedCourse.getId())
                 .orElseThrow(() -> new IllegalStateException(
-                        "Course with this id does not exist."
-        ));
+                        "Course with id" + updatedCourse.getId() + "does not exist.")
+        );
         if(!Objects.equals(originalCourse.getDescription(), updatedCourse.getDescription())) {
             originalCourse.setDescription(updatedCourse.getDescription());
         }
@@ -147,7 +147,8 @@ public class CourseService {
         }
     }
 
-    public List<Course> findCoursesByCriteria(Integer minAge, Integer maxAge, BigDecimal price, String teacher, Category category, String name) {
-        return courseRepository.findCoursesByCriteria(minAge, maxAge, price, teacher, category, name);
+    public List<Course> findCoursesByCriteria(
+            Integer minAge, Integer maxAge, BigDecimal price, String teacher, Category category, String name, String location) {
+        return courseRepository.findCoursesByCriteria(minAge, maxAge, price, teacher, category, name, location);
     }
 }

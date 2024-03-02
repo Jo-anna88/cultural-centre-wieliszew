@@ -44,7 +44,7 @@ public class CourseController {
     }
 
     @PostMapping()
-    public Course addCourse(@RequestBody Course course) {
+    public CourseDTO addCourse(@RequestBody Course course) {
         return courseService.addCourse(course); // id will be automatically added
     }
 
@@ -87,8 +87,9 @@ public class CourseController {
             @RequestParam(required = false) BigDecimal price,
             @RequestParam(required = false) String teacher,
             @RequestParam(required = false) Category category,
-            @RequestParam(required = false) String name) {
-        return courseService.findCoursesByCriteria(minAge, maxAge, price, teacher, category, name);
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String location) {
+        return courseService.findCoursesByCriteria(minAge, maxAge, price, teacher, category, name, location);
     }
 
 }

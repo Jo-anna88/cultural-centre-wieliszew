@@ -71,7 +71,7 @@ public class Course {
             orphanRemoval = true
     )
     //@JsonIgnoreProperties("course")
-    //@JsonManagedReference
+    @JsonManagedReference(value="course-user")
     private List<UserCourse> participants = new ArrayList<>();
 
 //    @JsonIgnore // for Bi-directional @OneToOne association (to remove data about courseDetails during sending to frontend course object)
@@ -85,7 +85,6 @@ public class Course {
 
     public Course() {}
     public Course(String imgSource, String name, String teacher, String description) {
-        //this.id = UUID.randomUUID();
         this.imgSource = imgSource;
         this.name = name;
         this.teacher = teacher;
@@ -95,6 +94,16 @@ public class Course {
     public Course(String imgSource, String name, String teacher, String description, Category category) {
         this(imgSource, name, teacher, description);
         this.category = category;
+    }
+
+    public Course (CourseDTO courseDTO) {
+        this(
+                courseDTO.getImgSource(),
+                courseDTO.getName(),
+                courseDTO.getTeacher(),
+                courseDTO.getDescription(),
+                courseDTO.getCategory()
+        );
     }
 
     // for Bi-directional @OneToOne association:

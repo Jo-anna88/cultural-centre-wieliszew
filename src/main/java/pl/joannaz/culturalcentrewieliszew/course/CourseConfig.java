@@ -3,6 +3,7 @@ package pl.joannaz.culturalcentrewieliszew.course;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import pl.joannaz.culturalcentrewieliszew.address.Address;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -18,7 +19,7 @@ public class CourseConfig {
             CourseDetails cd1 = new CourseDetails(
                 20,
                 BigDecimal.valueOf(150.00),
-                12,
+                new Address("Wieliszew", "05-135", "Kulturalna", "7", 10),
                 45,
                 5,
                 8,

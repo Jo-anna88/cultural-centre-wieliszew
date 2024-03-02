@@ -2,8 +2,10 @@ package pl.joannaz.culturalcentrewieliszew.course;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class CourseDTO {
+public class CourseDTO implements Serializable {
     private Long id;
     private String imgSource;
     private String name;;
