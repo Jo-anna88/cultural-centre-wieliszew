@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 import java.io.Serializable;
 import java.util.UUID;
 @Data
-public class UserDTO {
+public class UserDTO implements Serializable {
     // without pswd
     // constructor - create UserDTO from User
     // convertToUser (asUser())

@@ -34,18 +34,16 @@ public class CourseController {
     @GetMapping("/{id}")
     public CourseDTO getCourseById(@PathVariable("id") Long id) { // UUID id
         return courseService.getCourseById(id);
-        //return courseRepository.findById(id).get();
     }
 
     @GetMapping("/{id}/details")
     public CourseDetails getDetailsById(@PathVariable("id") Long id) {
-        CourseDetails courseDetails = courseService.getDetailsById(id);
         return courseService.getDetailsById(id);
     }
 
     @PostMapping()
-    public CourseDTO addCourse(@RequestBody Course course) {
-        return courseService.addCourse(course); // id will be automatically added
+    public CourseDTO addCourse(@RequestBody CourseDTO courseDTO) {
+        return courseService.addCourse(courseDTO); // id will be automatically added
     }
 
     @PostMapping("/{id}/details")
@@ -54,8 +52,8 @@ public class CourseController {
     }
 
     @PutMapping()
-    public Course updateCourse(@RequestBody Course updatedCourse) {
-        return courseService.updateCourse(updatedCourse);
+    public CourseDTO updateCourse(@RequestBody CourseDTO updatedCourseDTO) {
+        return courseService.updateCourse(updatedCourseDTO);
     }
 
     @PutMapping("/{id}/details")
@@ -81,7 +79,7 @@ public class CourseController {
     }
 
     @GetMapping("/search")
-    public List<Course> searchCourses(
+    public List<CourseDTO> searchCourses(
             @RequestParam(required = false) Integer minAge,
             @RequestParam(required = false) Integer maxAge,
             @RequestParam(required = false) BigDecimal price,

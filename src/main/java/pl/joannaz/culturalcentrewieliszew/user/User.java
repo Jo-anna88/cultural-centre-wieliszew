@@ -75,7 +75,7 @@ public class User implements UserDetails
             fetch = FetchType.EAGER
     )
     //@JsonIgnoreProperties("participant")
-    @JsonManagedReference
+    @JsonManagedReference(value="user-course")
     private List<UserCourse> courses = new ArrayList<>();
 
     //@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})

@@ -41,14 +41,13 @@ public class CourseService {
     }
 
     public CourseDetails getDetailsById (Long id) {
-        boolean detailsExists = detailsRepository.existsById(id);
-        // throw new NoSuchElementException("");
-        return detailsExists ? detailsRepository.findById(id).get() : null; // todo: check isPresent() (not return null!)
+        return detailsRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Course Details with id " + id + " does not exist."));
     }
 
-    public CourseDTO addCourse(Course course) {
-        //log.info("Saving new course: {} to the database", course.getName());
-        return new CourseDTO(courseRepository.save(course));
+    public CourseDTO addCourse(CourseDTO courseDTO) {
+        //log.info("Saving new course: {} to the database", courseDTO.getName());
+        return new CourseDTO(courseRepository.save(new Course(courseDTO)));
     }
 
     public void addAllCourses(List<Course> courses) {
@@ -57,30 +56,33 @@ public class CourseService {
 
     // @Transient - when we have setters in our class
     // thanks to that, we don't have to implement any JPQL query
-    public Course updateCourse(Course updatedCourse) {
-        Course originalCourse = courseRepository.findById(updatedCourse.getId())
-                .orElseThrow(() -> new IllegalStateException(
-                        "Course with id" + updatedCourse.getId() + "does not exist.")
+    public CourseDTO updateCourse(CourseDTO updatedCourseDTO) {
+        Course originalCourse = courseRepository.findById(updatedCourseDTO.getId())
+                .orElseThrow(() -> new NoSuchElementException(
+                        "Course with id" + updatedCourseDTO.getId() + "does not exist.")
         );
-        if(!Objects.equals(originalCourse.getDescription(), updatedCourse.getDescription())) {
-            originalCourse.setDescription(updatedCourse.getDescription());
+
+        if(!Objects.equals(originalCourse.getDescription(), updatedCourseDTO.getDescription())) {
+            originalCourse.setDescription(updatedCourseDTO.getDescription());
         }
-        if(!Objects.equals(originalCourse.getName(), updatedCourse.getName())) {
-            Optional<Course> courseOptional = courseRepository.findCourseByName(updatedCourse.getName());
+        if(!Objects.equals(originalCourse.getName(), updatedCourseDTO.getName())) {
+            Optional<Course> courseOptional = courseRepository.findCourseByName(updatedCourseDTO.getName());
             if (courseOptional.isPresent()) {
                 throw new IllegalStateException("Such a name already exists.");
             }
-            originalCourse.setName(updatedCourse.getName());
+            originalCourse.setName(updatedCourseDTO.getName());
         }
         // if...
-        originalCourse.setImgSource(updatedCourse.getImgSource());
+        originalCourse.setImgSource(updatedCourseDTO.getImgSource());
         // if...
-        originalCourse.setTeacher(updatedCourse.getTeacher());
+        originalCourse.setTeacher(updatedCourseDTO.getTeacher());
         // if...
-        originalCourse.setCategory(updatedCourse.getCategory());
-        return courseRepository.save(originalCourse);
+        originalCourse.setCategory(updatedCourseDTO.getCategory());
+
+        originalCourse.setMaxParticipantsNumber(updatedCourseDTO.getMaxParticipantsNumber());
+
+        return new CourseDTO(courseRepository.save(originalCourse));
         //return originalCourse; //because we use @Transactional we can use setters against methods from repository
-        //return new Course(courseRepository.save(originalCourse));
     }
 
     public Long deleteCourse(Long id) { // UUID
@@ -147,8 +149,11 @@ public class CourseService {
         }
     }
 
-    public List<Course> findCoursesByCriteria(
+    public List<CourseDTO> findCoursesByCriteria(
             Integer minAge, Integer maxAge, BigDecimal price, String teacher, Category category, String name, String location) {
-        return courseRepository.findCoursesByCriteria(minAge, maxAge, price, teacher, category, name, location);
+
+        return courseRepository.findCoursesByCriteria(minAge, maxAge, price, teacher, category, name).stream()
+                .map(CourseDTO::new)
+                .collect(Collectors.toList());
     }
 }

@@ -65,6 +65,12 @@ public class Course {
     @Enumerated(EnumType.STRING)
     private Category category;
 
+    @Column(
+            name="max_participants_number",
+            nullable = false
+    )
+    private int maxParticipantsNumber; // maksymalna liczba uczestników
+
     @OneToMany(
             mappedBy = "course",
             cascade = CascadeType.ALL,
@@ -72,27 +78,19 @@ public class Course {
     )
     //@JsonIgnoreProperties("course")
     @JsonManagedReference(value="course-user")
-    private List<UserCourse> participants = new ArrayList<>();
-
-//    @JsonIgnore // for Bi-directional @OneToOne association (to remove data about courseDetails during sending to frontend course object)
-//    @OneToOne( // for Bi-directional @OneToOne association
-//            mappedBy = "course",
-//            cascade = CascadeType.ALL,
-//            orphanRemoval = true,
-//            fetch = FetchType.LAZY
-//    )
-//    private CourseDetails courseDetails;
+    private List<UserCourse> participants = new ArrayList<>(maxParticipantsNumber);
 
     public Course() {}
-    public Course(String imgSource, String name, String teacher, String description) {
+    public Course(String imgSource, String name, String teacher, String description, int maxParticipantsNumber) {
         this.imgSource = imgSource;
         this.name = name;
         this.teacher = teacher;
         this.description = description;
+        this.maxParticipantsNumber = maxParticipantsNumber;
         this.category = Category.OTHER; // default
     }
-    public Course(String imgSource, String name, String teacher, String description, Category category) {
-        this(imgSource, name, teacher, description);
+    public Course(String imgSource, String name, String teacher, String description, int maxParticipantsNumber, Category category) {
+        this(imgSource, name, teacher, description, maxParticipantsNumber);
         this.category = category;
     }
 
@@ -102,15 +100,10 @@ public class Course {
                 courseDTO.getName(),
                 courseDTO.getTeacher(),
                 courseDTO.getDescription(),
+                courseDTO.getMaxParticipantsNumber(),
                 courseDTO.getCategory()
         );
     }
-
-    // for Bi-directional @OneToOne association:
-//    public Course(String imgSource, String name, String teacher, String description, Category category, CourseDetails courseDetails) {
-//        this(imgSource, name, teacher, description, category);
-//        this.addDetails(courseDetails);
-//    }
 
     public Course(Course originalCourse) {
         this(
@@ -118,23 +111,11 @@ public class Course {
                 originalCourse.name,
                 originalCourse.teacher,
                 originalCourse.description,
+                originalCourse.maxParticipantsNumber,
                 originalCourse.category
         );
         this.id = originalCourse.id;
     }
-
-    // for Bi-directional @OneToOne association:
-//    public void addDetails(CourseDetails courseDetails) {
-//        courseDetails.setCourse(this);
-//        this.courseDetails = courseDetails;
-//    }
-//
-//    public void removeDetails() {
-//        if (courseDetails != null) {
-//            courseDetails.setCourse(null);
-//            this.courseDetails = null;
-//        }
-//    }
 }
 
 

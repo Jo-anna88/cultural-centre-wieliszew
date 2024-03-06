@@ -92,9 +92,16 @@ public class UserService implements UserDetailsService { //interface UserService
     @Transactional
     public void addCourse(Long courseId) {
         Optional<Course> optionalCourse = this.courseRepository.findById(courseId);
-        if(optionalCourse.isPresent()) {
-            User currentUser = getCurrentUser();
-            currentUser.addCourse(optionalCourse.get());
+        if (optionalCourse.isPresent()) {
+            Course course = optionalCourse.get();
+            if (course.getParticipants().size() < course.getMaxParticipantsNumber()) {
+                User currentUser = getCurrentUser();
+                currentUser.addCourse(course);
+            } else {
+                throw new RuntimeException("Sorry, there is no more available slots for this course.");
+            }
+        } else {
+            throw new RuntimeException("there is no course with id: " + courseId);
         }
     }
 }
