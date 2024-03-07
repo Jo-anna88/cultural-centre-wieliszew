@@ -20,22 +20,23 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
     @Query("SELECT c FROM Course c " +
             "LEFT JOIN CourseDetails cd ON c.id = cd.id " +
+            "LEFT JOIN cd.address a " +
             "WHERE (:minimumAge IS NULL OR cd.minAge = :minimumAge) " +
             "AND (:maximumAge IS NULL OR cd.maxAge = :maximumAge) " +
             "AND (:price IS NULL OR cd.price <= :price)" +
             "AND (:teacher IS NULL OR c.teacher = :teacher) " +
             "AND (:category IS NULL OR c.category = :category) " +
-            "AND (:name IS NULL OR c.name = :name)" )
-            //+ "AND (:location IS NULL OR cd.address.city = :location)")
-            // +
+            "AND (:name IS NULL OR c.name = :name) " +
+            "AND (:location IS NULL OR a.city = :location)")
             //"AND (:date IS NULL OR cd.date = :date)") <- wymaga zmiany formatu daty, np. na dzień, godziny przedpołudniowe/popołudniowe
+
     List<Course> findCoursesByCriteria(
             @Param("minimumAge") Integer minimumAge,
             @Param("maximumAge") Integer maximumAge,
             @Param("price") BigDecimal price,
             @Param("teacher") String teacher,
             @Param("category") Category category,
-            @Param("name") String name
-            //@Param("location") String location
+            @Param("name") String name,
+            @Param("location") String location
     );
 }
