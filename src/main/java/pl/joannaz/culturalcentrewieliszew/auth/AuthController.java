@@ -94,7 +94,6 @@ public class AuthController {
             throw new Error("Username already exists.");
             //return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
         }
-        newUser.setId(UUID.randomUUID()); //is it needed?
         String encodedPassword = passwordEncoder.encode(newUser.getPassword());
         newUser.setPassword(encodedPassword);
         userService.addUser(newUser);

@@ -6,6 +6,8 @@ import lombok.Data;
 import org.springframework.context.annotation.Bean;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.UUID;
 @Data
 public class UserDTO implements Serializable {
@@ -18,6 +20,8 @@ public class UserDTO implements Serializable {
     private String phone;
     private String username; // e.g. email, login
     private Role role;
+    private LocalDate dob; // needed during signup
+    private int age;
     public UserDTO (User user) {
         this.id = user.getId();
         this.firstName = user.getFirstName();
@@ -25,5 +29,7 @@ public class UserDTO implements Serializable {
         this.phone = user.getPhone();
         this.username = user.getUsername();
         this.role = user.getRole();
+        this.dob = user.getDob();
+        this.age = Period.between(user.getDob(), LocalDate.now()).getYears();
     }
 }

@@ -84,7 +84,7 @@ public class UserController {
         throw new RuntimeException("cannot get current user's profile");
     }
 
-    @GetMapping("/full-name") // user's full name // todo: full-name could be returned as a result of login
+    @GetMapping("/full-name") // user's full name // todo: full-name (or UserDetailsDTO) could be returned as a result of login
     public Map<String,String> getFullName() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser;
@@ -110,5 +110,10 @@ public class UserController {
     @PostMapping("/join-course/{courseId}")
     public void joinCourse(@PathVariable("courseId") Long courseId) {
         userService.addCourse(courseId);
+    }
+
+    @GetMapping("/teachers")
+    public List<UserDetailsDTO> getTeachers() {
+        return userService.findTeachers();
     }
 }

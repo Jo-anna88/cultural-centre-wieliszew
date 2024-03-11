@@ -7,23 +7,26 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.joannaz.culturalcentrewieliszew.course.Course;
+import pl.joannaz.culturalcentrewieliszew.course.CourseDetails;
+import pl.joannaz.culturalcentrewieliszew.course.CourseDetailsRepository;
 import pl.joannaz.culturalcentrewieliszew.course.CourseRepository;
 import pl.joannaz.culturalcentrewieliszew.linkEntities.UserCourse;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class UserService implements UserDetailsService { //interface UserService ?
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
+    private final CourseDetailsRepository courseDetailsRepository;
 
-    public UserService (UserRepository userRepository, CourseRepository courseRepository) {
+    public UserService (UserRepository userRepository, CourseRepository courseRepository, CourseDetailsRepository courseDetailsRepository) {
         this.userRepository = userRepository;
         this.courseRepository = courseRepository;
+        this.courseDetailsRepository = courseDetailsRepository;
     }
     //private final User user;
     //User saveUser(User user); ?
@@ -91,17 +94,30 @@ public class UserService implements UserDetailsService { //interface UserService
 
     @Transactional
     public void addCourse(Long courseId) {
-        Optional<Course> optionalCourse = this.courseRepository.findById(courseId);
-        if (optionalCourse.isPresent()) {
-            Course course = optionalCourse.get();
-            if (course.getParticipants().size() < course.getMaxParticipantsNumber()) {
-                User currentUser = getCurrentUser();
+        Course course = this.courseRepository.findById(courseId).orElseThrow(() ->
+                new NoSuchElementException(String.format("Course with id %s not found.", courseId))
+        );
+//        CourseDetails courseDetails = courseDetailsRepository.findById(course.getId()).orElseThrow(() ->
+//                new NoSuchElementException(String.format("Course details with id %s not found.", courseId))
+//        );
+
+        if (course.getParticipants().size() < course.getMaxParticipantsNumber()) {
+            User currentUser = getCurrentUser();
+//            if (isAgeCorrect(currentUser.getDob(), courseDetails.getMinAge(), courseDetails.getMaxAge()))
                 currentUser.addCourse(course);
-            } else {
-                throw new RuntimeException("Sorry, there is no more available slots for this course.");
-            }
-        } else {
-            throw new RuntimeException("there is no course with id: " + courseId);
+//            else throw new RuntimeException("Sorry, your age does not fit within the age range of this course.");
         }
+        else {
+            throw new RuntimeException("Sorry, there is no more available slots for this course.");
+        }
+    }
+
+//    public boolean isAgeCorrect(LocalDate dob, int minAge, int maxAge) {
+//        int age = Period.between(dob, LocalDate.now()).getYears();
+//        return age >= minAge && age <= maxAge;
+//    }
+
+    public List<UserDetailsDTO> findTeachers() {
+        return userRepository.findTeachers();
     }
 }

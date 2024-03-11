@@ -5,10 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,6 +18,7 @@ import pl.joannaz.culturalcentrewieliszew.linkEntities.UserCourse;
 //import org.springframework.security.core.authority.SimpleGrantedAuthority;
 //import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Data // for setters and getters
@@ -48,6 +46,7 @@ public class User implements UserDetails
     private String phone;
     private String username; // e.g. email, login
     private String password;
+    private LocalDate dob; // date-of-birth
     @Enumerated(EnumType.STRING)
     private Role role; // in this app user can have only one role
     // or:
@@ -76,7 +75,7 @@ public class User implements UserDetails
     )
     //@JsonIgnoreProperties("participant")
     @JsonManagedReference(value="user-course")
-    private List<UserCourse> courses = new ArrayList<>();
+    private List<UserCourse> courses = new ArrayList<>(); // for CLIENT
 
     //@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     //private Set<CulturalEvent> culturalEvents = new HashSet<>();
@@ -87,6 +86,30 @@ public class User implements UserDetails
 //            fetch = FetchType.EAGER
 //    )
 //    private List<UserCulturalEvent> culturalEvents = new ArrayList<>();
+
+    // for development:
+    public User(UUID id, String firstName, String lastName, String phone, String username, String password, String dob, Role role) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phone = phone;
+        this.username = username;
+        this.password = password;
+        this.dob = LocalDate.parse(dob); // e.g. "2020-10-30"
+        this.role = role;
+    }
+
+    public User(UUID id, UUID parentId, String firstName, String lastName, String username, String dob) {
+        this.id = id;
+        this.parentId = parentId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        // this.phone = parent's phone
+        this.username = username; //parent's username + "/firstName" + "/lastName"
+        // this.password = EMPTY
+        this.dob = LocalDate.parse(dob);
+        this.role = Role.CLIENT;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
