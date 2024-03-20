@@ -2,9 +2,13 @@ package pl.joannaz.culturalcentrewieliszew.course;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.*;
+import pl.joannaz.culturalcentrewieliszew.user.User;
+import pl.joannaz.culturalcentrewieliszew.user.UserService;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(path="/api/classes")
@@ -13,9 +17,7 @@ public class CourseController {
     private final CourseService courseService;
 
     //@Autowired
-    public CourseController(CourseService courseService) {
-        this.courseService = courseService;
-    }
+    public CourseController(CourseService courseService) { this.courseService = courseService; }
 
     @GetMapping
     public List<CourseDTO> getAllCourses(HttpServletResponse response) throws InterruptedException {
@@ -37,7 +39,7 @@ public class CourseController {
     }
 
     @GetMapping("/{id}/details")
-    public CourseDetails getDetailsById(@PathVariable("id") Long id) {
+    public CourseDetailsDTO getDetailsById(@PathVariable("id") Long id) {
         return courseService.getDetailsById(id);
     }
 
@@ -47,8 +49,8 @@ public class CourseController {
     }
 
     @PostMapping("/{id}/details")
-    public CourseDetails addCourseDetails(@RequestBody CourseDetails courseDetails) {
-        return courseService.addCourseDetails(courseDetails);
+    public CourseDetailsDTO addCourseDetails(@RequestBody CourseDetailsDTO courseDetailsDTO) {
+        return courseService.addCourseDetails(courseDetailsDTO);
     }
 
     @PutMapping()
@@ -57,8 +59,8 @@ public class CourseController {
     }
 
     @PutMapping("/{id}/details")
-    public CourseDetails updateCourseDetails(@RequestBody CourseDetails updatedCourseDetails) {
-        return courseService.updateCourseDetails(updatedCourseDetails);
+    public CourseDetailsDTO updateCourseDetails(@RequestBody CourseDetailsDTO updatedCourseDetailsDTO) {
+        return courseService.updateCourseDetails(updatedCourseDetailsDTO);
     }
 
     @DeleteMapping("/{id}")
@@ -90,4 +92,9 @@ public class CourseController {
         return courseService.findCoursesByCriteria(minAge, maxAge, price, teacher, category, name, location);
     }
 
+    @GetMapping("/led-by/{teacherId}")
+    public List<String> getCoursesLedByTeacher(@PathVariable UUID teacherId) {
+        List<String> courseNames = courseService.getCoursesLedByTeacher(teacherId);
+        return courseNames;
+    }
 }

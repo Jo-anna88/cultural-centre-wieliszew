@@ -1,17 +1,22 @@
 package pl.joannaz.culturalcentrewieliszew.course;
 
-
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.Transient;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import pl.joannaz.culturalcentrewieliszew.address.Address;
+import pl.joannaz.culturalcentrewieliszew.address.AddressRepository;
 import pl.joannaz.culturalcentrewieliszew.linkEntities.UserCourse;
+import pl.joannaz.culturalcentrewieliszew.user.User;
+import pl.joannaz.culturalcentrewieliszew.user.UserRepository;
 
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static pl.joannaz.culturalcentrewieliszew.utils.constants.SIMPLE_TEXT;
 
 @Service
 //@Slf4j
@@ -19,11 +24,19 @@ public class CourseService {
 
     private final CourseRepository courseRepository;
     private final CourseDetailsRepository detailsRepository;
+    private final UserRepository userRepository;
+    private final AddressRepository addressRepository;
+    //private static final Logger log = LoggerFactory.getLogger(CourseService.class);
 
     //@Autowired
-    public CourseService (CourseRepository courseRepository, CourseDetailsRepository detailsRepository) {
+    public CourseService (CourseRepository courseRepository,
+                          CourseDetailsRepository detailsRepository,
+                          UserRepository userRepository,
+                          AddressRepository addressRepository) {
         this.courseRepository = courseRepository;
         this.detailsRepository = detailsRepository;
+        this.userRepository = userRepository;
+        this.addressRepository = addressRepository;
     }
 
     public List<CourseDTO> getAllCourses() {
@@ -31,35 +44,39 @@ public class CourseService {
         return courseRepository.findAll().stream().map(CourseDTO::new).collect(Collectors.toList());
     }
 
-    public CourseDTO getCourseById(Long id) { // UUID
-        //return new Course("assets/icons/ballet-shoes.png", "Ballet", "Anna Baletowicz", SIMPLE_TEXT);
-        Optional<Course> optionalCourse = courseRepository.findById(id);
-        if (optionalCourse.isPresent()) {
-            return new CourseDTO(optionalCourse.get());
-        }
-        throw new RuntimeException("cannot get a course with id: " + id);
+    public CourseDTO getCourseById(Long id) {
+        //log.info("Fetching course with id {}.", id);
+        return new CourseDTO(courseRepository.findById(id)
+                .orElseThrow(() -> {
+                    //log.error("Error during fetching course with id {}", id);
+                    return new NoSuchElementException(String.format("Course with id %s not found.", id));
+                }));
     }
 
-    public CourseDetails getDetailsById (Long id) {
+    public CourseDetailsDTO getDetailsById (Long id) {
         return detailsRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Course Details with id " + id + " does not exist."));
+                .map(CourseDetailsDTO::new)
+                .orElse(new CourseDetailsDTO());
+                //.orElseThrow(() -> new NoSuchElementException(String.format("Course Details with id %s not found.", id))));
     }
 
     public CourseDTO addCourse(CourseDTO courseDTO) {
         //log.info("Saving new course: {} to the database", courseDTO.getName());
-        return new CourseDTO(courseRepository.save(new Course(courseDTO)));
+        Course newCourse = new Course(courseDTO);
+        newCourse.setTeacher(getTeacherById(courseDTO.getTeacher().getId()));
+        return new CourseDTO(courseRepository.save(newCourse));
     }
 
-    public void addAllCourses(List<Course> courses) {
-        courseRepository.saveAll(courses);
+    public User getTeacherById(UUID teacherId) {
+        return userRepository.findById(teacherId)
+                .orElseThrow(() -> new NoSuchElementException(String.format("Teacher with id %s not found.", teacherId)));
     }
 
-    // @Transient - when we have setters in our class
-    // thanks to that, we don't have to implement any JPQL query
+    //because we use @Transactional we can use setters against methods from repository
     public CourseDTO updateCourse(CourseDTO updatedCourseDTO) {
         Course originalCourse = courseRepository.findById(updatedCourseDTO.getId())
-                .orElseThrow(() -> new NoSuchElementException(
-                        "Course with id" + updatedCourseDTO.getId() + "does not exist.")
+                .orElseThrow(() -> new NoSuchElementException(String.format(
+                        "Course with id %s not found.", updatedCourseDTO.getId()))
         );
 
         if(!Objects.equals(originalCourse.getDescription(), updatedCourseDTO.getDescription())) {
@@ -75,20 +92,20 @@ public class CourseService {
         // if...
         originalCourse.setImgSource(updatedCourseDTO.getImgSource());
         // if...
-        originalCourse.setTeacher(updatedCourseDTO.getTeacher());
+        originalCourse.setTeacher(getTeacherById(updatedCourseDTO.getTeacher().getId()));
         // if...
         originalCourse.setCategory(updatedCourseDTO.getCategory());
 
         originalCourse.setMaxParticipantsNumber(updatedCourseDTO.getMaxParticipantsNumber());
 
         return new CourseDTO(courseRepository.save(originalCourse));
-        //return originalCourse; //because we use @Transactional we can use setters against methods from repository
+        //return originalCourse;
     }
 
     public Long deleteCourse(Long id) { // UUID
         boolean exists = courseRepository.existsById(id);
         if (!exists) {
-            throw new IllegalStateException("Such a course does not exist.");
+            throw new IllegalStateException(String.format("Course with id %s not exist.", id));
         }
 
         boolean detailsExist = detailsRepository.existsById(id);
@@ -100,19 +117,27 @@ public class CourseService {
         return id;
     }
 
-    public CourseDetails addCourseDetails(CourseDetails courseDetails) {
-        Course course = courseRepository.findById(courseDetails.getId())
+    public CourseDetailsDTO addCourseDetails(CourseDetailsDTO courseDetailsDTO) {
+        Course course = courseRepository.findById(courseDetailsDTO.getId())
                 .orElseThrow(() -> new IllegalStateException(
-                        "Course Details with this id does not exist."
+                        String.format("Course with id %s not found.", courseDetailsDTO.getId())
                 ));
+        CourseDetails courseDetails = new CourseDetails(courseDetailsDTO);
+        courseDetails.setAddress(getAddressById(courseDetailsDTO.getLocation().getId()));
         courseDetails.setCourse(course);
-        return detailsRepository.save(courseDetails);
+
+        return new CourseDetailsDTO(detailsRepository.save(courseDetails));
     }
 
-    public CourseDetails updateCourseDetails(CourseDetails updatedCourseDetails) {
-        CourseDetails originalCourseDetails = detailsRepository.findById(updatedCourseDetails.getId())
+    public Address getAddressById(Integer addressId) {
+        return addressRepository.findById(addressId)
+                .orElseThrow(() -> new NoSuchElementException(String.format("Location with id %s not found.", addressId)));
+    }
+
+    public CourseDetailsDTO updateCourseDetails(CourseDetailsDTO updatedCourseDetailsDTO) {
+        CourseDetails originalCourseDetails = detailsRepository.findById(updatedCourseDetailsDTO.getId())
                 .orElseThrow(() -> new IllegalStateException(
-                        "Course Details with this id does not exist."
+                        String.format("Course Details with id %s not found.", updatedCourseDetailsDTO.getId())
                 ));
 //        originalCourseDetails.setMinAge(updatedCourseDetails.getMinAge());
 //        originalCourseDetails.setMaxAge(updatedCourseDetails.getMaxAge());
@@ -121,14 +146,17 @@ public class CourseService {
 //        originalCourseDetails.setLessonDurationMinutes(updatedCourseDetails.getLessonDurationMinutes());
 //        originalCourseDetails.setDate(updatedCourseDetails.getDate());
 //        originalCourseDetails.setRoomId(updatedCourseDetails.getRoomId());
-        originalCourseDetails.update(updatedCourseDetails);
-        return detailsRepository.save(originalCourseDetails);
+        originalCourseDetails.update(updatedCourseDetailsDTO);
+        if (!Objects.equals(originalCourseDetails.getAddress().getId(), updatedCourseDetailsDTO.getLocation().getId())) {
+            originalCourseDetails.setAddress(getAddressById(updatedCourseDetailsDTO.getLocation().getId()));
+        }
+        return new CourseDetailsDTO(detailsRepository.save(originalCourseDetails));
     }
 
     public Long deleteCourseDetails(Long id) {
         boolean detailsExist = detailsRepository.existsById(id);
         if (!detailsExist) {
-            throw new IllegalStateException("Course details do not exist.");
+            throw new IllegalStateException(String.format("Course details with id %s not exist.", id));
         }
         detailsRepository.deleteById(id);
         return id;
@@ -144,8 +172,7 @@ public class CourseService {
                     .map(user -> user.getFirstName() + " " + user.getLastName()) // Map User to UserDTO using constructor reference
                     .collect(Collectors.toList());
         } else {
-            // todo: Handle the case where user with the given ID is not found
-            return Collections.emptyList();
+            throw new EntityNotFoundException(String.format("Course with id %s not found.", id));
         }
     }
 
@@ -156,4 +183,9 @@ public class CourseService {
                 .map(CourseDTO::new)
                 .collect(Collectors.toList());
     }
+
+    public List<String> getCoursesLedByTeacher(UUID teacherId) {
+        return courseRepository.findCourseNamesByTeacherId(teacherId);
+    }
+
 }

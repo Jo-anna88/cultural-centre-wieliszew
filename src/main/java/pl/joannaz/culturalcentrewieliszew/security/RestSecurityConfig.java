@@ -62,9 +62,10 @@ public class RestSecurityConfig { // import org.springframework.security.config.
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/classes/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/contact").permitAll()
                         .requestMatchers("/api/user/**").permitAll() // just for testing
-                        //.requestMatchers(HttpMethod.GET, "/api/test/client").hasRole("CLIENT")
+                        .requestMatchers(HttpMethod.GET,"/api/address/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/contact").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/test/client").hasRole("CLIENT")
                         .requestMatchers(HttpMethod.GET, "/api/test/employee").hasRole("EMPLOYEE")
                         .requestMatchers(HttpMethod.GET, "/api/test/admin").hasRole("ADMIN")
                         .anyRequest().authenticated()

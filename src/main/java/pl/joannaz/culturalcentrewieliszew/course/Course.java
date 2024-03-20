@@ -4,11 +4,10 @@ import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.Data;
 import pl.joannaz.culturalcentrewieliszew.linkEntities.UserCourse;
+import pl.joannaz.culturalcentrewieliszew.user.User;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 /*
 @Table(
         name="course",
@@ -53,7 +52,9 @@ public class Course {
     )
     private String name;
 
-    private String teacher; // user_id that is a teacher (position)
+    //private String teacher; // user_id that is a teacher (position)
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User teacher;
 
     @Column(
             name="description",
@@ -81,7 +82,21 @@ public class Course {
     private List<UserCourse> participants = new ArrayList<>(maxParticipantsNumber);
 
     public Course() {}
-    public Course(String imgSource, String name, String teacher, String description, int maxParticipantsNumber) {
+
+    public Course(String imgSource, String name, String description, int maxParticipantsNumber) {
+        this.imgSource = imgSource;
+        this.name = name;
+        this.description = description;
+        this.maxParticipantsNumber = maxParticipantsNumber;
+        this.category = Category.OTHER; // default
+    }
+
+    public Course(String imgSource, String name, String description, int maxParticipantsNumber, Category category) {
+        this(imgSource, name, description, maxParticipantsNumber);
+        this.category = category;
+    }
+
+    public Course(String imgSource, String name, User teacher, String description, int maxParticipantsNumber) {
         this.imgSource = imgSource;
         this.name = name;
         this.teacher = teacher;
@@ -89,7 +104,7 @@ public class Course {
         this.maxParticipantsNumber = maxParticipantsNumber;
         this.category = Category.OTHER; // default
     }
-    public Course(String imgSource, String name, String teacher, String description, int maxParticipantsNumber, Category category) {
+    public Course(String imgSource, String name, User teacher, String description, int maxParticipantsNumber, Category category) {
         this(imgSource, name, teacher, description, maxParticipantsNumber);
         this.category = category;
     }
@@ -98,11 +113,12 @@ public class Course {
         this(
                 courseDTO.getImgSource(),
                 courseDTO.getName(),
-                courseDTO.getTeacher(),
+                // teacher set with usage of setter
                 courseDTO.getDescription(),
                 courseDTO.getMaxParticipantsNumber(),
                 courseDTO.getCategory()
         );
+        // id if update?
     }
 
     public Course(Course originalCourse) {

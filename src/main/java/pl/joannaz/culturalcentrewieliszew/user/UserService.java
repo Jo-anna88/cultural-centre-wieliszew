@@ -7,13 +7,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.joannaz.culturalcentrewieliszew.course.Course;
-import pl.joannaz.culturalcentrewieliszew.course.CourseDetails;
 import pl.joannaz.culturalcentrewieliszew.course.CourseDetailsRepository;
 import pl.joannaz.culturalcentrewieliszew.course.CourseRepository;
 import pl.joannaz.culturalcentrewieliszew.linkEntities.UserCourse;
 
-import java.time.LocalDate;
-import java.time.Period;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -117,7 +114,7 @@ public class UserService implements UserDetailsService { //interface UserService
 //        return age >= minAge && age <= maxAge;
 //    }
 
-    public List<UserDetailsDTO> findTeachers() {
+    public List<UserBasicInfo> findTeachers() {
         return userRepository.findTeachers();
     }
 }

@@ -14,13 +14,4 @@ public class CulturalCentreWieliszewApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(CulturalCentreWieliszewApplication.class, args);
 	}
-
-//	@Bean
-//	CommandLineRunner clr (CourseRepository courseRepository) {
-//		return args -> {
-//			Course c1 = new Course("assets/icons/ballet-shoes.png", "Ballet", "Anna Baletowicz", SIMPLE_TEXT);
-//			courseRepository.save(c1);
-//		};
-//	}
-
 }

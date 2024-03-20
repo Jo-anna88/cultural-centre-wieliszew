@@ -113,7 +113,7 @@ public class UserController {
     }
 
     @GetMapping("/teachers")
-    public List<UserDetailsDTO> getTeachers() {
+    public List<UserBasicInfo> getTeachers() {
         return userService.findTeachers();
     }
 }

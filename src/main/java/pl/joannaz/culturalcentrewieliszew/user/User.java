@@ -47,8 +47,11 @@ public class User implements UserDetails
     private String username; // e.g. email, login
     private String password;
     private LocalDate dob; // date-of-birth
+    private String headshot; // headshot photo source (e.g. "assets/images/avatar1.svg")
     @Enumerated(EnumType.STRING)
     private Role role; // in this app user can have only one role
+    private String position;
+    private String description; // employee description
     // or:
     // @ManyToMany(fetch = FetchType.EAGER)
     // Collection<Role> roles = new ArrayList<>(); // 'eager' because we want to load all the roles whenever we load the user
@@ -88,27 +91,67 @@ public class User implements UserDetails
 //    private List<UserCulturalEvent> culturalEvents = new ArrayList<>();
 
     // for development:
-    public User(UUID id, String firstName, String lastName, String phone, String username, String password, String dob, Role role) {
-        this.id = id;
+    // constructor for Client
+    public User(String firstName, String lastName, String phone, String username, String password,
+                String dob, String headshot) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.phone = phone;
         this.username = username;
         this.password = password;
         this.dob = LocalDate.parse(dob); // e.g. "2020-10-30"
-        this.role = role;
+        this.headshot = headshot;
+        this.role = Role.CLIENT;
+        //this.position = null;
+        //this.description = null;
     }
 
-    public User(UUID id, UUID parentId, String firstName, String lastName, String username, String dob) {
-        this.id = id;
+    // constructor for Employee or Admin
+    public User(String firstName, String lastName, String phone, String dob, String headshot,
+                Role role, String position, String description) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phone = phone;
+        this.username = createEmployeeUsername(firstName, lastName);
+        this.password = "$2a$10$vUQaRwWe6Km1cZk9T0.3OeVsgY/1X0NY.ngLlYOzkT91hubu3fDb."; // test
+        this.dob = LocalDate.parse(dob);
+        this.headshot = headshot;
+        this.role = role;
+        this.position = position;
+        this.description = description;
+    }
+
+    private String createEmployeeUsername(String firstName, String lastName) {
+        //todo: username: imie.nazwisko@ccw.pl (zmiana z polskich znakow na angielskie)
+        StringBuilder str = new StringBuilder(firstName.toLowerCase());
+        str.append(".");
+        str.append(lastName.toLowerCase());
+        str.append("@ccw.pl");
+        return str.toString();
+    }
+
+    protected String createChildUsername(String parentUsername, String firstName, String lastName) {
+        //todo: username: imie.nazwisko@ccw.pl (zmiana z polskich znakow na angielskie)
+        StringBuilder str = new StringBuilder(parentUsername);
+        str.append("/");
+        str.append(firstName);
+        str.append(lastName);
+        return str.toString();
+    }
+
+    // constructor for Client's child
+    public User(UUID parentId, String firstName, String lastName, String username, String dob, String headshot) {
         this.parentId = parentId;
         this.firstName = firstName;
         this.lastName = lastName;
-        // this.phone = parent's phone
+        // this.phone = parent's phone?
         this.username = username; //parent's username + "/firstName" + "/lastName"
-        // this.password = EMPTY
+        // this.password = null
         this.dob = LocalDate.parse(dob);
+        this.headshot = headshot;
         this.role = Role.CLIENT;
+        // this.position = null
+        // this.description = null
     }
 
     @Override

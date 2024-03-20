@@ -3,7 +3,7 @@ package pl.joannaz.culturalcentrewieliszew.course;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
-import pl.joannaz.culturalcentrewieliszew.models.Address;
+import pl.joannaz.culturalcentrewieliszew.address.Address;
 
 import java.math.BigDecimal;
 @Entity
@@ -29,24 +29,36 @@ public class CourseDetails {
     @JsonIgnore
     private Course course;
 
-    public CourseDetails(//int maxParticipantsNumber,
-                         BigDecimal price, Address address, int lessonDurationMinutes, int minAge, int maxAge, String date) {
-        this.price = price;
-        this.address = address;
-        this.lessonDurationMinutes = lessonDurationMinutes;
+    public CourseDetails(int minAge, int maxAge, BigDecimal price, int lessonDurationMinutes, String date, Address address) {
         this.minAge = minAge;
         this.maxAge = maxAge;
+        this.price = price;
+        this.lessonDurationMinutes = lessonDurationMinutes;
         this.date = date;
+        this.address = address;
     }
 
     public CourseDetails() {}
 
-    public void update(CourseDetails updatedCourseDetails){
-        setMinAge(updatedCourseDetails.getMinAge());
-        setMaxAge(updatedCourseDetails.getMaxAge());
-        setPrice(updatedCourseDetails.getPrice());
-        setLessonDurationMinutes(updatedCourseDetails.getLessonDurationMinutes());
-        setDate(updatedCourseDetails.getDate());
-        setAddress(updatedCourseDetails.getAddress());
+    public CourseDetails(CourseDetailsDTO courseDetailsDTO) {
+        this.minAge = courseDetailsDTO.getMinAge();
+        this.maxAge = courseDetailsDTO.getMaxAge();
+        this.price = courseDetailsDTO.getPrice();
+        this.lessonDurationMinutes = courseDetailsDTO.getLessonDurationMinutes();
+        this.date = courseDetailsDTO.getDate();
+        // address set with usage of setter
+        // course set with usage of setter
     }
+
+    public void update(CourseDetailsDTO updatedCourseDetailsDTO) {
+        this.minAge = updatedCourseDetailsDTO.getMinAge();
+        this.maxAge = updatedCourseDetailsDTO.getMaxAge();
+        this.price = updatedCourseDetailsDTO.getPrice();
+        this.lessonDurationMinutes = updatedCourseDetailsDTO.getLessonDurationMinutes();
+        this.date = updatedCourseDetailsDTO.getDate();
+        // address set with usage of setter
+        // course cannot be changed
+    }
+
+    // helper/utility methods for associations:
 }

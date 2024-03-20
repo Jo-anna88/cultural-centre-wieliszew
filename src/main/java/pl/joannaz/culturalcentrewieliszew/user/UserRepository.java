@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
@@ -13,7 +12,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     boolean existsByUsername (String username);
     List<User> findByParentId(UUID parentId);
 
-    @Query("SELECT new pl.joannaz.culturalcentrewieliszew.user.UserDetailsDTO(user.id, user.firstName, user.lastName) " +
-            "FROM User user WHERE user.role = pl.joannaz.culturalcentrewieliszew.user.Role.EMPLOYEE")
-    List<UserDetailsDTO> findTeachers();
+    @Query("SELECT new pl.joannaz.culturalcentrewieliszew.user.UserBasicInfo(user.id, user.firstName, user.lastName) " +
+            "FROM User user WHERE user.position = 'teacher'")
+    List<UserBasicInfo> findTeachers();
 }

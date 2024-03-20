@@ -3,6 +3,8 @@ package pl.joannaz.culturalcentrewieliszew.user;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 
 import java.util.List;
 import java.util.UUID;
@@ -10,80 +12,157 @@ import java.util.UUID;
 @Configuration
 public class UserConfig {
     @Bean
+    @Order(Ordered.HIGHEST_PRECEDENCE)
     CommandLineRunner userRunner (UserRepository userRepository) {
         return args -> userRepository.saveAll(
             List.of(
                     new User( // admin
-                            UUID.fromString("8781cef8-5532-43ec-b1b7-73df5c6f80ad"),
                             "Paweł",
                             "Zzz",
                             "123-456-789",
-                            "p@gmail.com",
-                            "$2a$10$vUQaRwWe6Km1cZk9T0.3OeVsgY/1X0NY.ngLlYOzkT91hubu3fDb.", // "test"
                             "1981-01-01",
-                            Role.ADMIN
+                            "assets/images/avatar3.svg",
+                            Role.ADMIN,
+                            "Director",
+                            "description"
                     ),
                     new User( // parent1
-                            UUID.fromString("0a11ea3f-69c8-42e9-b162-3d51f3e3a826"),
                             "Joanna",
                             "Zzz",
                             "123-456-789",
-                            "j@gmail.com",
+                            "joanna.zzz@gmail.com",
                             "$2a$10$vUQaRwWe6Km1cZk9T0.3OeVsgY/1X0NY.ngLlYOzkT91hubu3fDb.",
                             "1988-03-01",
-                            Role.CLIENT
+                            "assets/images/avatar4.svg"
                     ),
+                    new User( // parent2
+                            "Franek",
+                            "Aaa",
+                            "123-456-789",
+                            "franek.aaa@gmail.com",
+                            "$2a$10$vUQaRwWe6Km1cZk9T0.3OeVsgY/1X0NY.ngLlYOzkT91hubu3fDb.",
+                            "1975-12-20",
+                            "assets/images/avatar1.svg"
+                    ),
+                    new User( // employee1
+                            "Anna",
+                            "Baletowicz",
+                            "789-111-111",
+                            "2000-01-01",
+                            "assets/images/avatar2.png",
+                            Role.EMPLOYEE,
+                            "teacher",
+                            "Lorem ipsum"
+                    ),
+                    new User( // employee2
+                            "Igor",
+                            "Szachista",
+                            "789-222-222",
+                            "2000-02-02",
+                            "assets/images/avatar1.png",
+                            Role.EMPLOYEE,
+                            "teacher",
+                            "Lorem ipsum"
+                    ),
+                    new User( // employee3
+                            "Jan",
+                            "Muzyk",
+                            "789-333-333",
+                            "2000-03-03",
+                            "assets/images/avatar1.png",
+                            Role.EMPLOYEE,
+                            "teacher",
+                            "Lorem ipsum"
+                    ),
+                    new User( // employee4
+                            "Katarzyna",
+                            "Waza",
+                            "789-444-444",
+                            "2000-04-04",
+                            "assets/images/avatar2.png",
+                            Role.EMPLOYEE,
+                            "teacher",
+                            "Lorem ipsum"
+                    ),
+                    new User( // employee5
+                            "Agnieszka",
+                            "Teatralna",
+                            "789-555-555",
+                            "2000-05-05",
+                            "assets/images/avatar2.png",
+                            Role.EMPLOYEE,
+                            "teacher",
+                            "Lorem ipsum"
+                    ),
+                    new User( // employee6
+                            "Lukasz",
+                            "Wokalista",
+                            "789-222-222",
+                            "2000-06-06",
+                            "assets/images/avatar1.png",
+                            Role.EMPLOYEE,
+                            "teacher",
+                            "Lorem ipsum"
+                    ),
+                    new User( // employee7
+                            "Piotr",
+                            "Programista",
+                            "789-777-777",
+                            "2000-07-07",
+                            "assets/images/avatar1.png",
+                            Role.EMPLOYEE,
+                            "teacher",
+                            "Lorem ipsum"
+                    )
+            )
+        );
+    }
+
+    @Bean
+    CommandLineRunner childUserRunner (UserRepository userRepository) {
+        return args -> userRepository.saveAll(
+                List.of(
                     new User( // child1.1
-                            UUID.fromString("1474a8e1-209f-4c10-81f7-4e7cd4a52fc2"),
-                            UUID.fromString("0a11ea3f-69c8-42e9-b162-3d51f3e3a826"),
+                            userRepository.findByUsername("joanna.zzz@gmail.com").get().getId(),
                             "Iga",
                             "Zzz",
                             "j@gmail.com/IgaZzz",
-                            "2010-04-01"
+                            "2010-04-01",
+                            "assets/images/avatar-girl.svg"
                     ),
                     new User( // child1.2
-                            UUID.fromString("0b767555-3d43-41ce-a638-14ec3e9b69f3"),
-                            UUID.fromString("0a11ea3f-69c8-42e9-b162-3d51f3e3a826"),
+                            userRepository.findByUsername("joanna.zzz@gmail.com").get().getId(),
                             "Franek",
                             "Zzz",
                             "j@gmail.com/FranekZzz",
-                            "2012-05-01"
+                            "2012-05-01",
+                            "assets/images/avatar-boy.svg"
                     ),
                     new User( // child1.3
-                            UUID.fromString("544361c1-13d8-4e29-8631-d0a985ead644"),
-                            UUID.fromString("0a11ea3f-69c8-42e9-b162-3d51f3e3a826"),
+                            userRepository.findByUsername("joanna.zzz@gmail.com").get().getId(),
                             "Piotr",
                             "Zzz",
                             "j@gmail.com/PiotrZzz",
-                            "2014-07-01"
-                    ),
-                    new User( // parent2
-                            UUID.fromString("fd50915e-2a50-4302-9407-c886c0057936"),
-                            "Szymon",
-                            "Aaa",
-                            "123-456-789",
-                            "szymon@gmail.com",
-                            "$2a$10$vUQaRwWe6Km1cZk9T0.3OeVsgY/1X0NY.ngLlYOzkT91hubu3fDb.",
-                            "1975-12-20",
-                            Role.CLIENT
+                            "2014-07-01",
+                            "assets/images/avatar-boy.svg"
                     ),
                     new User( // child2.1
-                            UUID.fromString("c5c02518-ec95-49bf-b52b-ff6a670d58e4"),
-                            UUID.fromString("fd50915e-2a50-4302-9407-c886c0057936"),
+                            userRepository.findByUsername("franek.aaa@gmail.com").get().getId(),
                             "Lukasz",
                             "Aaa",
                             "szymon@gmail.com/LukaszAaa",
-                            "2000-03-15"
+                            "2000-03-15",
+                            "assets/images/avatar-boy.svg"
                     ),
                     new User( // child2.2
-                            UUID.fromString("3e50d6d0-d41e-490d-ab40-1cb12e109865"),
-                            UUID.fromString("fd50915e-2a50-4302-9407-c886c0057936"),
+                            userRepository.findByUsername("franek.aaa@gmail.com").get().getId(),
                             "Zofia",
                             "Aaa",
                             "szymon@gmail.com/ZofiaAaa",
-                            "2004-11-25"
+                            "2004-11-25",
+                            "assets/images/avatar-girl.svg"
                     )
-            )
+                )
         );
     }
 }

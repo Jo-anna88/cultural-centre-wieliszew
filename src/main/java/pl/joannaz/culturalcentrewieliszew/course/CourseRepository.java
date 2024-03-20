@@ -39,4 +39,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             @Param("name") String name,
             @Param("location") String location
     );
+
+    @Query("SELECT c.name FROM Course c WHERE c.teacher.id = :teacherId")
+    List<String> findCourseNamesByTeacherId(@Param("teacherId") UUID teacherId);
 }
