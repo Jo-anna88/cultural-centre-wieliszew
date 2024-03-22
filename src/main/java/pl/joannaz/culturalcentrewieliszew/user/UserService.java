@@ -117,4 +117,8 @@ public class UserService implements UserDetailsService { //interface UserService
     public List<UserBasicInfo> findTeachers() {
         return userRepository.findTeachers();
     }
+
+    public List<EmployeeProfile> findEmployees() {
+        return userRepository.findEmployees();
+    }
 }

@@ -116,4 +116,9 @@ public class UserController {
     public List<UserBasicInfo> getTeachers() {
         return userService.findTeachers();
     }
+
+    @GetMapping("/employees")
+    public List<EmployeeProfile> getEmployees() {
+        return userService.findEmployees();
+    }
 }

@@ -49,7 +49,7 @@ public class UserConfig {
                             "Baletowicz",
                             "789-111-111",
                             "2000-01-01",
-                            "assets/images/avatar2.png",
+                            "assets/images/avatar2.svg",
                             Role.EMPLOYEE,
                             "teacher",
                             "Lorem ipsum"
@@ -59,7 +59,7 @@ public class UserConfig {
                             "Szachista",
                             "789-222-222",
                             "2000-02-02",
-                            "assets/images/avatar1.png",
+                            "assets/images/avatar1.svg",
                             Role.EMPLOYEE,
                             "teacher",
                             "Lorem ipsum"
@@ -69,7 +69,7 @@ public class UserConfig {
                             "Muzyk",
                             "789-333-333",
                             "2000-03-03",
-                            "assets/images/avatar1.png",
+                            "assets/images/avatar1.svg",
                             Role.EMPLOYEE,
                             "teacher",
                             "Lorem ipsum"
@@ -79,7 +79,7 @@ public class UserConfig {
                             "Waza",
                             "789-444-444",
                             "2000-04-04",
-                            "assets/images/avatar2.png",
+                            "assets/images/avatar2.svg",
                             Role.EMPLOYEE,
                             "teacher",
                             "Lorem ipsum"
@@ -89,7 +89,7 @@ public class UserConfig {
                             "Teatralna",
                             "789-555-555",
                             "2000-05-05",
-                            "assets/images/avatar2.png",
+                            "assets/images/avatar2.svg",
                             Role.EMPLOYEE,
                             "teacher",
                             "Lorem ipsum"
@@ -99,7 +99,7 @@ public class UserConfig {
                             "Wokalista",
                             "789-222-222",
                             "2000-06-06",
-                            "assets/images/avatar1.png",
+                            "assets/images/avatar1.svg",
                             Role.EMPLOYEE,
                             "teacher",
                             "Lorem ipsum"
@@ -109,7 +109,7 @@ public class UserConfig {
                             "Programista",
                             "789-777-777",
                             "2000-07-07",
-                            "assets/images/avatar1.png",
+                            "assets/images/avatar1.svg",
                             Role.EMPLOYEE,
                             "teacher",
                             "Lorem ipsum"
