@@ -92,18 +92,32 @@ public class User implements UserDetails
 
     // for development:
     // constructor for Client
-    public User(String firstName, String lastName, String phone, String username, String password,
-                String dob, String headshot) {
+    public User(String firstName, String lastName, String phone, String username, String dob, String headshot) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.phone = phone;
         this.username = username;
-        this.password = password;
+        this.password = "$2a$10$vUQaRwWe6Km1cZk9T0.3OeVsgY/1X0NY.ngLlYOzkT91hubu3fDb."; // test
         this.dob = LocalDate.parse(dob); // e.g. "2020-10-30"
         this.headshot = headshot;
         this.role = Role.CLIENT;
         //this.position = null;
         //this.description = null;
+    }
+
+    // constructor for Client's child
+    public User(UUID parentId, String firstName, String lastName, String username, String dob, String headshot) {
+        this.parentId = parentId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        // this.phone = parent's phone?
+        this.username = username; //parent's username + "/firstName" + "/lastName"
+        // this.password = null
+        this.dob = LocalDate.parse(dob);
+        this.headshot = headshot;
+        this.role = Role.CLIENT;
+        // this.position = null
+        // this.description = null
     }
 
     // constructor for Employee or Admin
@@ -137,21 +151,6 @@ public class User implements UserDetails
         str.append(firstName);
         str.append(lastName);
         return str.toString();
-    }
-
-    // constructor for Client's child
-    public User(UUID parentId, String firstName, String lastName, String username, String dob, String headshot) {
-        this.parentId = parentId;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        // this.phone = parent's phone?
-        this.username = username; //parent's username + "/firstName" + "/lastName"
-        // this.password = null
-        this.dob = LocalDate.parse(dob);
-        this.headshot = headshot;
-        this.role = Role.CLIENT;
-        // this.position = null
-        // this.description = null
     }
 
     @Override

@@ -31,7 +31,6 @@ public class UserConfig {
                             "Zzz",
                             "123-456-789",
                             "joanna.zzz@gmail.com",
-                            "$2a$10$vUQaRwWe6Km1cZk9T0.3OeVsgY/1X0NY.ngLlYOzkT91hubu3fDb.",
                             "1988-03-01",
                             "assets/images/avatar4.svg"
                     ),
@@ -40,7 +39,6 @@ public class UserConfig {
                             "Aaa",
                             "123-456-789",
                             "franek.aaa@gmail.com",
-                            "$2a$10$vUQaRwWe6Km1cZk9T0.3OeVsgY/1X0NY.ngLlYOzkT91hubu3fDb.",
                             "1975-12-20",
                             "assets/images/avatar1.svg"
                     ),
@@ -51,7 +49,7 @@ public class UserConfig {
                             "2000-01-01",
                             "assets/images/avatar2.svg",
                             Role.EMPLOYEE,
-                            "teacher",
+                            "Teacher",
                             "Lorem ipsum"
                     ),
                     new User( // employee2
@@ -61,7 +59,7 @@ public class UserConfig {
                             "2000-02-02",
                             "assets/images/avatar1.svg",
                             Role.EMPLOYEE,
-                            "teacher",
+                            "Teacher",
                             "Lorem ipsum"
                     ),
                     new User( // employee3
@@ -71,7 +69,7 @@ public class UserConfig {
                             "2000-03-03",
                             "assets/images/avatar1.svg",
                             Role.EMPLOYEE,
-                            "teacher",
+                            "Teacher",
                             "Lorem ipsum"
                     ),
                     new User( // employee4
@@ -81,7 +79,7 @@ public class UserConfig {
                             "2000-04-04",
                             "assets/images/avatar2.svg",
                             Role.EMPLOYEE,
-                            "teacher",
+                            "Teacher",
                             "Lorem ipsum"
                     ),
                     new User( // employee5
@@ -91,7 +89,7 @@ public class UserConfig {
                             "2000-05-05",
                             "assets/images/avatar2.svg",
                             Role.EMPLOYEE,
-                            "teacher",
+                            "Teacher",
                             "Lorem ipsum"
                     ),
                     new User( // employee6
@@ -101,7 +99,7 @@ public class UserConfig {
                             "2000-06-06",
                             "assets/images/avatar1.svg",
                             Role.EMPLOYEE,
-                            "teacher",
+                            "Teacher",
                             "Lorem ipsum"
                     ),
                     new User( // employee7
@@ -111,7 +109,7 @@ public class UserConfig {
                             "2000-07-07",
                             "assets/images/avatar1.svg",
                             Role.EMPLOYEE,
-                            "teacher",
+                            "Teacher",
                             "Lorem ipsum"
                     )
             )
@@ -126,15 +124,15 @@ public class UserConfig {
                             userRepository.findByUsername("joanna.zzz@gmail.com").get().getId(),
                             "Iga",
                             "Zzz",
-                            "j@gmail.com/IgaZzz",
+                            "joanna.zzz@gmail.com/IgaZzz",
                             "2010-04-01",
                             "assets/images/avatar-girl.svg"
                     ),
                     new User( // child1.2
                             userRepository.findByUsername("joanna.zzz@gmail.com").get().getId(),
-                            "Franek",
+                            "Maksymilian",
                             "Zzz",
-                            "j@gmail.com/FranekZzz",
+                            "joanna.zzz@gmail.com/MaksymilianZzz",
                             "2012-05-01",
                             "assets/images/avatar-boy.svg"
                     ),
@@ -142,7 +140,7 @@ public class UserConfig {
                             userRepository.findByUsername("joanna.zzz@gmail.com").get().getId(),
                             "Piotr",
                             "Zzz",
-                            "j@gmail.com/PiotrZzz",
+                            "joanna.zzz@gmail.com/PiotrZzz",
                             "2014-07-01",
                             "assets/images/avatar-boy.svg"
                     ),
@@ -150,7 +148,7 @@ public class UserConfig {
                             userRepository.findByUsername("franek.aaa@gmail.com").get().getId(),
                             "Lukasz",
                             "Aaa",
-                            "szymon@gmail.com/LukaszAaa",
+                            "franek.aaa@gmail.com/LukaszAaa",
                             "2000-03-15",
                             "assets/images/avatar-boy.svg"
                     ),
@@ -158,7 +156,7 @@ public class UserConfig {
                             userRepository.findByUsername("franek.aaa@gmail.com").get().getId(),
                             "Zofia",
                             "Aaa",
-                            "szymon@gmail.com/ZofiaAaa",
+                            "franek.aaa@gmail.com/ZofiaAaa",
                             "2004-11-25",
                             "assets/images/avatar-girl.svg"
                     )

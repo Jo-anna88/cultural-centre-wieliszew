@@ -1,10 +1,12 @@
 package pl.joannaz.culturalcentrewieliszew.user;
 
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import pl.joannaz.culturalcentrewieliszew.course.Course;
+import pl.joannaz.culturalcentrewieliszew.course.CourseDTO;
 
 import java.util.*;
 
@@ -102,14 +104,50 @@ public class UserController {
     }
 
     @GetMapping("/courses")
-    public List<Course> getCourses() {
+    public List<CourseDTO> getCourses() {
         User currentUser = userService.getCurrentUser();
         return userService.getCoursesForUser(currentUser.getId());
     }
 
-    @PostMapping("/join-course/{courseId}")
+    @GetMapping("/courses/{id}")
+    public List<CourseDTO> getCoursesById(@PathVariable("id") UUID id) {
+        return userService.getCoursesForUser(id);
+    }
+
+    @GetMapping("/join-course/{courseId}")
     public void joinCourse(@PathVariable("courseId") Long courseId) {
-        userService.addCourse(courseId);
+        try {
+            userService.addCourse(courseId);
+        } catch (DataIntegrityViolationException e) {
+            throw new RuntimeException("You are already enrolled for this class.");
+        }
+    }
+
+    @GetMapping("/join-course/{courseId}/{userId}")
+    public void joinCourseByUserId(@PathVariable("courseId") Long courseId, @PathVariable("userId") UUID userId) {
+        userService.joinCourseByUserId(courseId, userId);
+    }
+
+    @GetMapping("/user-simple")
+    public UserBasicInfo getUserSimpleData() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(!(authentication instanceof AnonymousAuthenticationToken)) {
+            User currentUser = (User) authentication.getPrincipal();
+            return new UserBasicInfo(currentUser.getId(), currentUser.getFirstName(), currentUser.getLastName());
+        } else {
+            throw new RuntimeException("Cannot get children data for this user.");
+        }
+    }
+
+    @GetMapping("/children-simple")
+    public List<UserBasicInfo> getChildrenSimpleData(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(!(authentication instanceof AnonymousAuthenticationToken)) {
+            UUID id = ((User) authentication.getPrincipal()).getId();
+            return userService.getChildrenSimpleData(id);
+        } else {
+            throw new RuntimeException("Cannot get children data for this user.");
+        }
     }
 
     @GetMapping("/teachers")

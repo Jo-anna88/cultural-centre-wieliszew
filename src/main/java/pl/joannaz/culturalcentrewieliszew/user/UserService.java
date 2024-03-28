@@ -6,13 +6,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.joannaz.culturalcentrewieliszew.course.Course;
-import pl.joannaz.culturalcentrewieliszew.course.CourseDetailsRepository;
-import pl.joannaz.culturalcentrewieliszew.course.CourseRepository;
+import pl.joannaz.culturalcentrewieliszew.course.*;
 import pl.joannaz.culturalcentrewieliszew.linkEntities.UserCourse;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService implements UserDetailsService { //interface UserService ?
@@ -75,14 +72,15 @@ public class UserService implements UserDetailsService { //interface UserService
 
     }
 
-    public List<Course> getCoursesForUser(UUID userId) {
+    public List<CourseDTO> getCoursesForUser(UUID userId) {
         Optional<User> optionalUser = userRepository.findById(userId);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            List<UserCourse> userCourses = user.getCourses();
-            return userCourses.stream()
+            List<CourseDTO> result = user.getCourses().stream()
                     .map(UserCourse::getCourse)
-                    .collect(Collectors.toList());
+                    .map(CourseDTO::new)
+                    .toList();
+            return result;
         } else {
             // todo: Handle the case where user with the given ID is not found
             return Collections.emptyList();
@@ -91,17 +89,34 @@ public class UserService implements UserDetailsService { //interface UserService
 
     @Transactional
     public void addCourse(Long courseId) {
-        Course course = this.courseRepository.findById(courseId).orElseThrow(() ->
-                new NoSuchElementException(String.format("Course with id %s not found.", courseId))
-        );
+            Course course = this.courseRepository.findById(courseId).orElseThrow(() ->
+                    new NoSuchElementException(String.format("Course with id %s not found.", courseId))
+            );
 //        CourseDetails courseDetails = courseDetailsRepository.findById(course.getId()).orElseThrow(() ->
 //                new NoSuchElementException(String.format("Course details with id %s not found.", courseId))
 //        );
 
-        if (course.getParticipants().size() < course.getMaxParticipantsNumber()) {
-            User currentUser = getCurrentUser();
+            if (course.getParticipants().size() < course.getMaxParticipantsNumber()) {
+                User currentUser = getCurrentUser();
 //            if (isAgeCorrect(currentUser.getDob(), courseDetails.getMinAge(), courseDetails.getMaxAge()))
                 currentUser.addCourse(course);
+//            else throw new RuntimeException("Sorry, your age does not fit within the age range of this course.");
+            } else {
+                throw new RuntimeException("Sorry, there is no more available slots for this course.");
+            }
+    }
+
+    @Transactional
+    public void joinCourseByUserId(Long courseId, UUID userId) {
+        Course course = this.courseRepository.findById(courseId).orElseThrow(() ->
+                new NoSuchElementException(String.format("Course with id %s not found.", courseId))
+        );
+        User user = this.userRepository.findById(userId).orElseThrow(() ->
+                new NoSuchElementException(String.format("User with id %s not found.", userId))
+        );
+        if (course.getParticipants().size() < course.getMaxParticipantsNumber()) {
+//            if (isAgeCorrect(child.getDob(), courseDetails.getMinAge(), courseDetails.getMaxAge()))
+            user.addCourse(course);
 //            else throw new RuntimeException("Sorry, your age does not fit within the age range of this course.");
         }
         else {
@@ -120,5 +135,10 @@ public class UserService implements UserDetailsService { //interface UserService
 
     public List<EmployeeProfile> findEmployees() {
         return userRepository.findEmployees();
+    }
+
+    public List<UserBasicInfo> getChildrenSimpleData(UUID id) {
+        List<UserBasicInfo> childrenSimpleList = userRepository.findChildrenBasicInfo(id);
+        return childrenSimpleList;
     }
 }
