@@ -13,6 +13,7 @@ import pl.joannaz.culturalcentrewieliszew.course.Course;
 //import pl.joannaz.culturalcentrewieliszew.course.CourseDetails;
 //import pl.joannaz.culturalcentrewieliszew.culturalEvent.CulturalEvent;
 import pl.joannaz.culturalcentrewieliszew.linkEntities.UserCourse;
+import pl.joannaz.culturalcentrewieliszew.utils.Utility;
 //import pl.joannaz.culturalcentrewieliszew.linkEntities.UserCulturalEvent;
 //import org.springframework.security.core.GrantedAuthority;
 //import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,6 +21,9 @@ import pl.joannaz.culturalcentrewieliszew.linkEntities.UserCourse;
 
 import java.time.LocalDate;
 import java.util.*;
+
+import static pl.joannaz.culturalcentrewieliszew.utils.constants.PASSWORD;
+import static pl.joannaz.culturalcentrewieliszew.utils.constants.SIMPLE_TEXT_SHORT;
 
 @Data // for setters and getters
 @Builder // to use Builder design pattern
@@ -97,7 +101,7 @@ public class User implements UserDetails
         this.lastName = lastName;
         this.phone = phone;
         this.username = username;
-        this.password = "$2a$10$vUQaRwWe6Km1cZk9T0.3OeVsgY/1X0NY.ngLlYOzkT91hubu3fDb."; // test
+        this.password = PASSWORD; // test
         this.dob = LocalDate.parse(dob); // e.g. "2020-10-30"
         this.headshot = headshot;
         this.role = Role.CLIENT;
@@ -105,6 +109,7 @@ public class User implements UserDetails
         //this.description = null;
     }
 
+    // for development:
     // constructor for Client's child
     public User(UUID parentId, String firstName, String lastName, String username, String dob, String headshot) {
         this.parentId = parentId;
@@ -121,36 +126,18 @@ public class User implements UserDetails
     }
 
     // constructor for Employee or Admin
-    public User(String firstName, String lastName, String phone, String dob, String headshot,
+    public User(String firstName, String lastName, String phone, String dob,
                 Role role, String position, String description) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.phone = phone;
-        this.username = createEmployeeUsername(firstName, lastName);
-        this.password = "$2a$10$vUQaRwWe6Km1cZk9T0.3OeVsgY/1X0NY.ngLlYOzkT91hubu3fDb."; // test
+        this.username = UserHelper.createEmployeeUsername(firstName, lastName);
+        this.password = PASSWORD;
         this.dob = LocalDate.parse(dob);
-        this.headshot = headshot;
+        this.headshot = UserHelper.isFemale(firstName) ? "assets/images/avatar2.svg" : "assets/images/avatar1.svg";
         this.role = role;
         this.position = position;
         this.description = description;
-    }
-
-    private String createEmployeeUsername(String firstName, String lastName) {
-        //todo: username: imie.nazwisko@ccw.pl (zmiana z polskich znakow na angielskie)
-        StringBuilder str = new StringBuilder(firstName.toLowerCase());
-        str.append(".");
-        str.append(lastName.toLowerCase());
-        str.append("@ccw.pl");
-        return str.toString();
-    }
-
-    protected String createChildUsername(String parentUsername, String firstName, String lastName) {
-        //todo: username: imie.nazwisko@ccw.pl (zmiana z polskich znakow na angielskie)
-        StringBuilder str = new StringBuilder(parentUsername);
-        str.append("/");
-        str.append(firstName);
-        str.append(lastName);
-        return str.toString();
     }
 
     @Override

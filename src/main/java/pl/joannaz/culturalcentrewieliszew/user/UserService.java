@@ -25,6 +25,9 @@ public class UserService implements UserDetailsService { //interface UserService
     //private final User user;
     //User saveUser(User user); ?
     public User addUser(User user) {
+        // set headshot
+        user.setHeadshot(UserHelper.isFemale(user.getFirstName()) ? "assets/images/avatar4.svg" : "assets/images/avatar3.svg");
+
         return this.userRepository.save(user);
     }
     public Optional<User> findUserByUsername(String username) {return this.userRepository.findByUsername(username);}
@@ -37,13 +40,19 @@ public class UserService implements UserDetailsService { //interface UserService
     public List<User> getChildren(UUID parentId) {
         return userRepository.findByParentId(parentId);
     }
-    public User addChild(UUID parentId, User childUser) {
-        // Retrieve the parent user
-        if (!userRepository.existsById(parentId)) {
-            throw new RuntimeException("Parent user not found");
-        }
-        // Set the parent ID for the child user
-        childUser.setParentId(parentId);
+    public User addChild(User parentUser, User childUser) {
+        // Set the parent ID
+        childUser.setParentId(parentUser.getId());
+
+        // Set a contact phone as parent's phone
+        childUser.setPhone(parentUser.getPhone());
+
+        // Set a username based on parent's username
+        childUser.setUsername(UserHelper.createChildUsername(parentUser.getUsername(), childUser.getFirstName(), childUser.getLastName()));
+
+        // Set a headshot
+        childUser.setHeadshot(UserHelper.isFemale(childUser.getFirstName()) ? "assets/images/avatar-girl.svg" : "assets/images/avatar-boy.svg");
+
         // Save the child user
         return userRepository.save(childUser);
     }
@@ -56,15 +65,16 @@ public class UserService implements UserDetailsService { //interface UserService
         originalChild.setFirstName(updatedChild.getFirstName());
         originalChild.setLastName(updatedChild.getLastName());
         originalChild.setPhone(updatedChild.getPhone());
+        originalChild.setDob(updatedChild.getDob());
         return userRepository.save(originalChild);
     }
 
-    public User getChild (UUID childId) {
-        return userRepository.findById(childId).get(); // todo: check isPresent()
+    public User getUser (UUID userId) {
+        return userRepository.findById(userId).get(); // todo: check isPresent()
     }
 
     public void deleteChild (UUID childId) {
-        userRepository.deleteById(childId); // todo: courses list should be deleted too
+        userRepository.deleteById(childId); // todo: courses list should be deleted too?
     }
 
     public User getCurrentUser() {
@@ -140,5 +150,39 @@ public class UserService implements UserDetailsService { //interface UserService
     public List<UserBasicInfo> getChildrenSimpleData(UUID id) {
         List<UserBasicInfo> childrenSimpleList = userRepository.findChildrenBasicInfo(id);
         return childrenSimpleList;
+    }
+
+    public EmployeeProfile getEmployeeById(UUID id) {
+        User employee = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalStateException(
+                        String.format("Employee with id %s does not exist.", id)
+                ));
+        return new EmployeeProfile(id, employee.getFirstName(), employee.getLastName(),
+                employee.getHeadshot(), employee.getPosition(), employee.getDescription());
+    }
+
+    public void deleteEmployee(UUID employeeId) { // todo: use deleteChild() method?
+        userRepository.deleteById(employeeId);
+    }
+
+    public User addEmployee(UserDTO employee) {
+        User newEmployee = UserHelper.createEmployee(employee);
+        return userRepository.save(newEmployee);
+    }
+
+    @Transactional
+    public User updateEmployee(UserDTO updatedEmployee) {
+        User originalEmployee = userRepository.findById(updatedEmployee.getId())
+                .orElseThrow(() -> new IllegalStateException(
+                        "Employee with this id does not exist."
+                ));
+        originalEmployee.setFirstName(updatedEmployee.getFirstName());
+        originalEmployee.setLastName(updatedEmployee.getLastName());
+        originalEmployee.setPhone(updatedEmployee.getPhone());
+        originalEmployee.setDob(updatedEmployee.getDob());
+        originalEmployee.setRole(updatedEmployee.getRole());
+        originalEmployee.setPosition(updatedEmployee.getPosition());
+        originalEmployee.setDescription(updatedEmployee.getDescription());
+        return originalEmployee;
     }
 }

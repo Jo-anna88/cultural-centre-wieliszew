@@ -4,10 +4,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Immutable;
 
 @NoArgsConstructor
+@AllArgsConstructor
+@Getter
 @Table(
         name="address",
         uniqueConstraints = {
@@ -45,13 +48,5 @@ public class Address {
     public Address(int id, String location, String city, String zipCode, String street, String houseNumber, int flatNumber) {
         this(id, location, city, zipCode, street, houseNumber);
         this.flatNumber = flatNumber;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public String getLocation() {
-        return location;
     }
 }

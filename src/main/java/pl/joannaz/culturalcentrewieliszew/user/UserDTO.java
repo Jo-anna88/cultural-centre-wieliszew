@@ -26,6 +26,8 @@ public class UserDTO implements Serializable {
     private String position; // for Employee/Admin
     private String description; // for Employee/Admin
 
+    public UserDTO () {}
+
     public UserDTO (User user) {
         this.id = user.getId();
         this.firstName = user.getFirstName();

@@ -33,46 +33,6 @@ public class UserController {
     user.setPassword(encodedPassword);
     userRepository.save(user);
      */
-    @GetMapping("/children")
-    public List<UserDTO> getChildrenByParentId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
-            UUID parentId = ((User) authentication.getPrincipal()).getId();
-            List<User> children = userService.getChildren(parentId);
-            List<UserDTO> childrenDTO = new ArrayList<>(children.size());
-            for (User child : children) {
-                childrenDTO.add(new UserDTO(child));
-            }
-            return childrenDTO;
-        }
-        throw new RuntimeException("cannot get list of children");
-    }
-    @PostMapping("/child")
-    public UserDTO addChild(@RequestBody User child) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
-            UUID parentId = ((User) authentication.getPrincipal()).getId();
-            User newChild = userService.addChild(parentId, child);
-            return new UserDTO(newChild);
-        }
-        throw new RuntimeException("cannot add a child");
-    }
-
-    @PutMapping("/child")
-    public UserDTO updateChild(@RequestBody User child) {
-        return new UserDTO(userService.updateChild(child));
-    }
-
-    @DeleteMapping("/child/{id}")
-    public void deleteChild(@PathVariable("id") UUID id) {
-        userService.deleteChild(id);
-    }
-
-    @GetMapping("child/{id}")
-    public UserDTO getChild(@PathVariable("id") UUID id) {
-        return new UserDTO(userService.getChild(id));
-    }
-
     @GetMapping("/profile")
     public UserDTO getUserProfile() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -103,6 +63,71 @@ public class UserController {
         throw new RuntimeException("cannot get current user's name and surname");
     }
 
+    @GetMapping("/user-simple")
+    public UserBasicInfo getUserSimpleData() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(!(authentication instanceof AnonymousAuthenticationToken)) {
+            User currentUser = (User) authentication.getPrincipal();
+            return new UserBasicInfo(currentUser.getId(), currentUser.getFirstName(), currentUser.getLastName());
+        } else {
+            throw new RuntimeException("Cannot get children data for this user.");
+        }
+    }
+
+    // User's children endpoints:
+    @GetMapping("/children-simple")
+    public List<UserBasicInfo> getChildrenSimpleData(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(!(authentication instanceof AnonymousAuthenticationToken)) {
+            UUID id = ((User) authentication.getPrincipal()).getId();
+            return userService.getChildrenSimpleData(id);
+        } else {
+            throw new RuntimeException("Cannot get children data for this user.");
+        }
+    }
+
+    @GetMapping("/children")
+    public List<UserDTO> getChildrenByParentId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+            UUID parentId = ((User) authentication.getPrincipal()).getId();
+            List<User> children = userService.getChildren(parentId);
+            List<UserDTO> childrenDTO = new ArrayList<>(children.size());
+            for (User child : children) {
+                childrenDTO.add(new UserDTO(child));
+            }
+            return childrenDTO;
+        }
+        throw new RuntimeException("cannot get list of children");
+    }
+    @PostMapping("/child")
+    public UserDTO addChild(@RequestBody User child) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+            User parentUser = (User) authentication.getPrincipal();
+            User newChild = userService.addChild(parentUser, child);
+            return new UserDTO(newChild);
+        }
+        throw new RuntimeException("cannot add a child");
+    }
+
+    @PutMapping("/child")
+    public UserDTO updateChild(@RequestBody User child) {
+        return new UserDTO(userService.updateChild(child));
+    }
+
+    @DeleteMapping("/child/{id}")
+    public void deleteChild(@PathVariable("id") UUID id) {
+        userService.deleteChild(id);
+    }
+
+    @GetMapping("child/{id}")
+    public UserDTO getChild(@PathVariable("id") UUID id) {
+        return new UserDTO(userService.getUser(id));
+    }
+
+    // User's courses endpoints:
+
     @GetMapping("/courses")
     public List<CourseDTO> getCourses() {
         User currentUser = userService.getCurrentUser();
@@ -128,35 +153,37 @@ public class UserController {
         userService.joinCourseByUserId(courseId, userId);
     }
 
-    @GetMapping("/user-simple")
-    public UserBasicInfo getUserSimpleData() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(!(authentication instanceof AnonymousAuthenticationToken)) {
-            User currentUser = (User) authentication.getPrincipal();
-            return new UserBasicInfo(currentUser.getId(), currentUser.getFirstName(), currentUser.getLastName());
-        } else {
-            throw new RuntimeException("Cannot get children data for this user.");
-        }
-    }
-
-    @GetMapping("/children-simple")
-    public List<UserBasicInfo> getChildrenSimpleData(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(!(authentication instanceof AnonymousAuthenticationToken)) {
-            UUID id = ((User) authentication.getPrincipal()).getId();
-            return userService.getChildrenSimpleData(id);
-        } else {
-            throw new RuntimeException("Cannot get children data for this user.");
-        }
-    }
+    // Teacher endpoint:
 
     @GetMapping("/teachers")
     public List<UserBasicInfo> getTeachers() {
         return userService.findTeachers();
     }
 
+    // Employee endpoints:
+
     @GetMapping("/employees")
     public List<EmployeeProfile> getEmployees() {
         return userService.findEmployees();
+    }
+
+    @GetMapping("/employee/{id}")
+    public EmployeeProfile getEmployeeById(@PathVariable("id") UUID id) {
+        return userService.getEmployeeById(id);
+    }
+
+    @PostMapping("/employee")
+    public UserDTO addEmployee(@RequestBody UserDTO employee) {
+        return new UserDTO(userService.addEmployee(employee));
+    }
+
+    @PutMapping("/employee")
+    public UserDTO updateEmployee(@RequestBody UserDTO employee) {
+        return new UserDTO(userService.updateEmployee(employee));
+    }
+
+    @DeleteMapping("/employee/{id}")
+    public void deleteEmployee(@PathVariable("id") UUID id) {
+        userService.deleteEmployee(id);
     }
 }

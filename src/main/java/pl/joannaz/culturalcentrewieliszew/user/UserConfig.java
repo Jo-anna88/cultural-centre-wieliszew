@@ -9,6 +9,8 @@ import org.springframework.core.annotation.Order;
 import java.util.List;
 import java.util.UUID;
 
+import static pl.joannaz.culturalcentrewieliszew.utils.constants.SIMPLE_TEXT_SHORT;
+
 @Configuration
 public class UserConfig {
     @Bean
@@ -21,10 +23,9 @@ public class UserConfig {
                             "Zzz",
                             "123-456-789",
                             "1981-01-01",
-                            "assets/images/avatar3.svg",
                             Role.ADMIN,
                             "Director",
-                            "description"
+                            SIMPLE_TEXT_SHORT
                     ),
                     new User( // parent1
                             "Joanna",
@@ -40,77 +41,70 @@ public class UserConfig {
                             "123-456-789",
                             "franek.aaa@gmail.com",
                             "1975-12-20",
-                            "assets/images/avatar1.svg"
+                            "assets/images/avatar3.svg"
                     ),
                     new User( // employee1
                             "Anna",
                             "Baletowicz",
                             "789-111-111",
                             "2000-01-01",
-                            "assets/images/avatar2.svg",
                             Role.EMPLOYEE,
                             "Teacher",
-                            "Lorem ipsum"
+                            SIMPLE_TEXT_SHORT
                     ),
                     new User( // employee2
                             "Igor",
                             "Szachista",
                             "789-222-222",
                             "2000-02-02",
-                            "assets/images/avatar1.svg",
                             Role.EMPLOYEE,
                             "Teacher",
-                            "Lorem ipsum"
+                            SIMPLE_TEXT_SHORT
                     ),
                     new User( // employee3
                             "Jan",
                             "Muzyk",
                             "789-333-333",
                             "2000-03-03",
-                            "assets/images/avatar1.svg",
                             Role.EMPLOYEE,
                             "Teacher",
-                            "Lorem ipsum"
+                            SIMPLE_TEXT_SHORT
                     ),
                     new User( // employee4
                             "Katarzyna",
                             "Waza",
                             "789-444-444",
                             "2000-04-04",
-                            "assets/images/avatar2.svg",
                             Role.EMPLOYEE,
                             "Teacher",
-                            "Lorem ipsum"
+                            SIMPLE_TEXT_SHORT
                     ),
                     new User( // employee5
                             "Agnieszka",
                             "Teatralna",
                             "789-555-555",
                             "2000-05-05",
-                            "assets/images/avatar2.svg",
                             Role.EMPLOYEE,
                             "Teacher",
-                            "Lorem ipsum"
+                            SIMPLE_TEXT_SHORT
                     ),
                     new User( // employee6
                             "Lukasz",
                             "Wokalista",
                             "789-222-222",
                             "2000-06-06",
-                            "assets/images/avatar1.svg",
                             Role.EMPLOYEE,
                             "Teacher",
-                            "Lorem ipsum"
+                            SIMPLE_TEXT_SHORT
                     ),
                     new User( // employee7
                             "Piotr",
                             "Programista",
                             "789-777-777",
                             "2000-07-07",
-                            "assets/images/avatar1.svg",
                             Role.EMPLOYEE,
                             "Teacher",
-                            "Lorem ipsum"
+                            SIMPLE_TEXT_SHORT
                     )
             )
         );

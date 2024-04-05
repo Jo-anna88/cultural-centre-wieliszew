@@ -94,10 +94,12 @@ public class AuthController {
             throw new Error("Username already exists.");
             //return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
         }
+
+        // Set password
         String encodedPassword = passwordEncoder.encode(newUser.getPassword());
         newUser.setPassword(encodedPassword);
-        userService.addUser(newUser);
-        return new UserDTO(newUser);
+
+        return new UserDTO(userService.addUser(newUser));
     }
 
     @PostMapping(path="/logout")

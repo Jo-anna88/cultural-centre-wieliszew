@@ -1,9 +1,9 @@
 package pl.joannaz.culturalcentrewieliszew.course;
 
 import lombok.Data;
+import pl.joannaz.culturalcentrewieliszew.user.Role;
 import pl.joannaz.culturalcentrewieliszew.user.UserBasicInfo;
 
-import java.util.UUID;
 import java.io.Serializable;
 
 @Data

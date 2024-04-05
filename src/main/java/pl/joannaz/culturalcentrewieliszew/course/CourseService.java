@@ -184,7 +184,7 @@ public class CourseService {
                 .collect(Collectors.toList());
     }
 
-    public List<String> getCoursesLedByTeacher(UUID teacherId) {
+    public List<CourseBasicInfo> getCoursesLedByTeacher(UUID teacherId) {
         return courseRepository.findCourseNamesByTeacherId(teacherId);
     }
 
