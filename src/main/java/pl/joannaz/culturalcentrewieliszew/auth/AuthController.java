@@ -1,12 +1,8 @@
 package pl.joannaz.culturalcentrewieliszew.auth;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,10 +13,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import pl.joannaz.culturalcentrewieliszew.security.jwt.JWTService;
-import pl.joannaz.culturalcentrewieliszew.user.Role;
 import pl.joannaz.culturalcentrewieliszew.user.User;
-import pl.joannaz.culturalcentrewieliszew.user.UserDTO;
+import pl.joannaz.culturalcentrewieliszew.user.UserBasicInfo;
 import pl.joannaz.culturalcentrewieliszew.user.UserService;
+import pl.joannaz.culturalcentrewieliszew.utils.Utility;
 
 import java.util.*;
 
@@ -36,7 +32,7 @@ public class AuthController {
     private String jwtCookieName; // = "jwt";
 
     @PostMapping(path="/login") // authenticate user
-    public UserDTO login (@RequestBody Map<String,String> credentials, HttpServletResponse response) {
+    public UserBasicInfo login (@RequestBody Map<String,String> credentials, HttpServletResponse response) {
         //credentials - LinkedHashMap, keys: username and password
         Authentication authentication = authManager
                 .authenticate(new UsernamePasswordAuthenticationToken(credentials.get("username"), credentials.get("password")));
@@ -65,7 +61,13 @@ public class AuthController {
 
         response.addCookie(jwtService.generateJwtCookie(jwtCookieName, token));
 
-        return new UserDTO(currentUser);
+//        Map<String,String> result = new HashMap<>(2);
+//        result.put("firstName", currentUser.getFirstName());
+//        result.put("lastName", currentUser.getLastName());
+        UserBasicInfo userBasicInfo = new UserBasicInfo(null, currentUser.getFirstName(), currentUser.getLastName());
+        return userBasicInfo;
+
+        //return new UserDTO(currentUser);
         // WITHOUT SECURITY CONTEXT AND WITHOUT JWT
        /*
         Optional<User> user = userService.findUserByUsername(credentials.get("username"));
@@ -89,7 +91,7 @@ public class AuthController {
     }
 
     @PostMapping(path="/signup") // id=null
-    public UserDTO signup (@RequestBody User newUser) {
+    public void signup (@RequestBody User newUser) {
         if (userService.existsByUsername(newUser.getUsername())) {
             throw new Error("Username already exists.");
             //return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
@@ -99,7 +101,8 @@ public class AuthController {
         String encodedPassword = passwordEncoder.encode(newUser.getPassword());
         newUser.setPassword(encodedPassword);
 
-        return new UserDTO(userService.addUser(newUser));
+        userService.addUser(newUser);
+        //return new UserDTO(userService.addUser(newUser));
     }
 
     @PostMapping(path="/logout")
