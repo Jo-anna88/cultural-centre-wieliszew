@@ -94,7 +94,6 @@ public class CourseController {
 
     @GetMapping("/led-by/{teacherId}")
     public List<CourseBasicInfo> getCoursesLedByTeacher(@PathVariable UUID teacherId) {
-        List<CourseBasicInfo> courseNames = courseService.getCoursesLedByTeacher(teacherId);
-        return courseNames;
+        return courseService.getCoursesLedByTeacher(teacherId);
     }
 }

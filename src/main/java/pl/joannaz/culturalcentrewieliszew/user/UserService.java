@@ -12,24 +12,22 @@ import pl.joannaz.culturalcentrewieliszew.linkEntities.UserCourse;
 import java.util.*;
 
 @Service
-public class UserService implements UserDetailsService { //interface UserService ?
+public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
-    private final CourseDetailsRepository courseDetailsRepository;
 
-    public UserService (UserRepository userRepository, CourseRepository courseRepository, CourseDetailsRepository courseDetailsRepository) {
+    public UserService (UserRepository userRepository, CourseRepository courseRepository) {
         this.userRepository = userRepository;
         this.courseRepository = courseRepository;
-        this.courseDetailsRepository = courseDetailsRepository;
     }
-    //private final User user;
-    //User saveUser(User user); ?
-    public User addUser(User user) {
+
+    public void addUser(User user) {
         // set headshot
         user.setHeadshot(UserHelper.isFemale(user.getFirstName()) ? "assets/images/avatar4.svg" : "assets/images/avatar3.svg");
-
-        return this.userRepository.save(user);
+        this.userRepository.save(user);
     }
+
+
     public Optional<User> findUserByUsername(String username) {return this.userRepository.findByUsername(username);}
     public boolean existsByUsername(String username) {return this.userRepository.existsByUsername(username);}
     @Override
@@ -51,7 +49,7 @@ public class UserService implements UserDetailsService { //interface UserService
         childUser.setUsername(UserHelper.createChildUsername(parentUser.getUsername(), childUser.getFirstName(), childUser.getLastName()));
 
         // Set a headshot
-        childUser.setHeadshot(UserHelper.isFemale(childUser.getFirstName()) ? "assets/images/avatar-girl.svg" : "assets/images/avatar-boy.svg");
+        childUser.setHeadshot(UserHelper.generateChildHeadshotValue(childUser.getFirstName()));
 
         // Save the child user
         return userRepository.save(childUser);
@@ -62,39 +60,47 @@ public class UserService implements UserDetailsService { //interface UserService
                 .orElseThrow(() -> new IllegalStateException(
                         "Child with this id does not exist."
                 ));
-        originalChild.setFirstName(updatedChild.getFirstName());
-        originalChild.setLastName(updatedChild.getLastName());
+
+        if(!Objects.equals(originalChild.getFirstName(), updatedChild.getFirstName())
+        || !Objects.equals(originalChild.getLastName(), updatedChild.getLastName())) {
+            originalChild.setFirstName(updatedChild.getFirstName());
+            originalChild.setLastName(updatedChild.getLastName());
+
+            // change username if updated one does not exist already
+            String updatedUsername = UserHelper.updateChildUsername(
+                    updatedChild.getUsername(), updatedChild.getFirstName(), updatedChild.getLastName());
+            if (!this.existsByUsername(updatedUsername)) {originalChild.setUsername(updatedUsername);}
+
+            // set headshot in case firstName has been changed (and it causes a change in the previously assumed gender)
+            originalChild.setHeadshot(UserHelper.generateChildHeadshotValue(updatedChild.getFirstName()));
+        }
         originalChild.setPhone(updatedChild.getPhone());
         originalChild.setDob(updatedChild.getDob());
+
         return userRepository.save(originalChild);
     }
 
     public User getUser (UUID userId) {
-        return userRepository.findById(userId).get(); // todo: check isPresent()
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalStateException(
+                        String.format("User with id %s does not exist.", userId)
+                ));
     }
 
-    public void deleteChild (UUID childId) {
-        userRepository.deleteById(childId); // todo: courses list should be deleted too?
+    public void deleteChild (UUID childId) { // corresponding rows in UserCourse are deleted automatically (removing child from lists of participants)
+        userRepository.deleteById(childId);
     }
 
     public User getCurrentUser() {
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
     }
 
-    public List<CourseDTO> getCoursesForUser(UUID userId) {
-        Optional<User> optionalUser = userRepository.findById(userId);
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            List<CourseDTO> result = user.getCourses().stream()
-                    .map(UserCourse::getCourse)
-                    .map(CourseDTO::new)
-                    .toList();
-            return result;
-        } else {
-            // todo: Handle the case where user with the given ID is not found
-            return Collections.emptyList();
-        }
+    public List<CourseBasicInfo> getCoursesForUser(UUID userId) {
+        User user = this.getUser(userId);
+        return user.getCourses().stream()
+                .map(UserCourse::getCourse)
+                .map(CourseBasicInfo::new)
+                .toList();
     }
 
     @Transactional
@@ -148,8 +154,7 @@ public class UserService implements UserDetailsService { //interface UserService
     }
 
     public List<UserBasicInfo> getChildrenSimpleData(UUID id) {
-        List<UserBasicInfo> childrenSimpleList = userRepository.findChildrenBasicInfo(id);
-        return childrenSimpleList;
+        return userRepository.findChildrenBasicInfo(id);
     }
 
     public EmployeeProfile getEmployeeById(UUID id) {
@@ -161,7 +166,16 @@ public class UserService implements UserDetailsService { //interface UserService
                 employee.getHeadshot(), employee.getPosition(), employee.getDescription());
     }
 
-    public void deleteEmployee(UUID employeeId) { // todo: use deleteChild() method?
+    @Transactional
+    public void deleteEmployee(UUID employeeId) {
+        User employee = userRepository.findById(employeeId)
+                .orElseThrow(() -> new IllegalStateException(
+                        String.format("Employee with id %s does not exist.", employeeId)
+                ));
+        if(employee.getPosition().equals("Teacher")) { // get teacher courses and set teacher value to null
+            List<Course> courses = this.courseRepository.findTeacherCourses(employeeId);
+            courses.forEach(course -> course.setTeacher(null));
+        }
         userRepository.deleteById(employeeId);
     }
 
@@ -183,6 +197,28 @@ public class UserService implements UserDetailsService { //interface UserService
         originalEmployee.setRole(updatedEmployee.getRole());
         originalEmployee.setPosition(updatedEmployee.getPosition());
         originalEmployee.setDescription(updatedEmployee.getDescription());
-        return originalEmployee;
+        return this.userRepository.save(originalEmployee);
+    }
+
+    @Transactional
+    public User updateClient(UserDTO updatedClient) {
+        User originalClient = this.getCurrentUser();
+        originalClient.setFirstName(updatedClient.getFirstName());
+        originalClient.setLastName(updatedClient.getLastName());
+        originalClient.setPhone(updatedClient.getPhone());
+        originalClient.setDob(updatedClient.getDob());
+        return this.userRepository.save(originalClient);
+    }
+
+    @Transactional
+    public void deleteClientAccount () { // only for Role.CLIENT
+        User currentUser = this.getCurrentUser();
+
+        // check if user has children and remove children accounts
+        List<User> children = this.getChildren(currentUser.getId());
+        children.forEach(child -> this.deleteChild(child.getId()));
+
+        // remove user account (corresponding rows in UserCourse should be deleted automatically)
+        this.userRepository.deleteById(currentUser.getId());
     }
 }

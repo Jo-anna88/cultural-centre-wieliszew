@@ -19,8 +19,17 @@ public class UserHelper {
         return str.toString();
     }
 
+    protected static String updateChildUsername(String oldUsername, String firstName, String lastName) {
+        String parentUsername = oldUsername.split("/")[0];
+        return UserHelper.createChildUsername(parentUsername, firstName, lastName);
+    }
+
     protected static boolean isFemale(String firstName) {
         return firstName.endsWith("a");
+    }
+
+    protected static String generateChildHeadshotValue(String firstName) {
+        return UserHelper.isFemale(firstName) ? "assets/images/avatar-girl.svg" : "assets/images/avatar-boy.svg";
     }
 
     protected static User createEmployee(UserDTO userDTO) {

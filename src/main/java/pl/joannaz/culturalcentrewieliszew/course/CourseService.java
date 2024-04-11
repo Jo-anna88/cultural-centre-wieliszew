@@ -63,7 +63,9 @@ public class CourseService {
     public CourseDTO addCourse(CourseDTO courseDTO) {
         //log.info("Saving new course: {} to the database", courseDTO.getName());
         Course newCourse = new Course(courseDTO);
-        newCourse.setTeacher(getTeacherById(courseDTO.getTeacher().getId()));
+        if(courseDTO.getTeacher().getId() != null) {
+            newCourse.setTeacher(getTeacherById(courseDTO.getTeacher().getId()));
+        }
         return new CourseDTO(courseRepository.save(newCourse));
     }
 
@@ -102,14 +104,20 @@ public class CourseService {
         //return originalCourse;
     }
 
+
+    @Transactional
     public Long deleteCourse(Long id) { // UUID
-        boolean exists = courseRepository.existsById(id);
-        if (!exists) {
+        boolean courseExists = courseRepository.existsById(id);
+        if (!courseExists) {
             throw new IllegalStateException(String.format("Course with id %s not exist.", id));
         }
-
-        boolean detailsExist = detailsRepository.existsById(id);
-        if (detailsExist) {
+        /* Course course = courseRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException(String.format(
+                        "Course with id %s does not exist.", id)
+                ));
+*/
+        boolean detailsExists = detailsRepository.existsById(id);
+        if (detailsExists) {
             detailsRepository.deleteById(id);
         }
 

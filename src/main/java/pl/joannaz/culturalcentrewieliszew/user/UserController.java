@@ -6,6 +6,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import pl.joannaz.culturalcentrewieliszew.course.CourseBasicInfo;
 import pl.joannaz.culturalcentrewieliszew.course.CourseDTO;
 
 import java.util.*;
@@ -17,6 +18,16 @@ public class UserController {
     private final UserService userService;
 
     public UserController(UserService userService) { this.userService = userService; }
+
+    @PutMapping()
+    public UserDTO updateClient(@RequestBody UserDTO updatedClient) {
+        return new UserDTO(this.userService.updateClient(updatedClient));
+    }
+
+    @DeleteMapping()
+    public void deleteClient() {
+        this.userService.deleteClientAccount();
+    }
 //    @GetMapping
 //    public List<User> getUsers() {
 //        return List.of(new User(UUID.randomUUID(), "name", "aaa@o2.pl"));
@@ -46,22 +57,22 @@ public class UserController {
         throw new RuntimeException("cannot get current user's profile");
     }
 
-    @GetMapping("/full-name") // user's full name // todo: full-name (or UserDetailsDTO) could be returned as a result of login
-    public Map<String,String> getFullName() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser;
-        // Check if the authentication object is not null and is an instance of UserDetails
-        //if(!(authentication instanceof AnonymousAuthenticationToken))
-        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
-            // Cast the principal to User
-            currentUser = (User) authentication.getPrincipal();
-            Map<String,String> response = new HashMap<>(2);
-            response.put("firstName", currentUser.getFirstName());
-            response.put("lastName", currentUser.getLastName());
-            return response;
-        }
-        throw new RuntimeException("cannot get current user's name and surname");
-    }
+//    @GetMapping("/full-name") // user's full name
+//    public Map<String,String> getFullName() {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        User currentUser;
+//        // Check if the authentication object is not null and is an instance of UserDetails
+//        //if(!(authentication instanceof AnonymousAuthenticationToken))
+//        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+//            // Cast the principal to User
+//            currentUser = (User) authentication.getPrincipal();
+//            Map<String,String> response = new HashMap<>(2);
+//            response.put("firstName", currentUser.getFirstName());
+//            response.put("lastName", currentUser.getLastName());
+//            return response;
+//        }
+//        throw new RuntimeException("cannot get current user's name and surname");
+//    }
 
     @GetMapping("/user-simple")
     public UserBasicInfo getUserSimpleData() {
@@ -122,21 +133,21 @@ public class UserController {
     }
 
     @GetMapping("child/{id}")
-    public UserDTO getChild(@PathVariable("id") UUID id) {
+    public UserDTO getChildById(@PathVariable("id") UUID id) {
         return new UserDTO(userService.getUser(id));
     }
 
     // User's courses endpoints:
 
     @GetMapping("/courses")
-    public List<CourseDTO> getCourses() {
+    public List<CourseBasicInfo> getCourses() {
         User currentUser = userService.getCurrentUser();
         return userService.getCoursesForUser(currentUser.getId());
     }
 
     @GetMapping("/courses/{id}")
-    public List<CourseDTO> getCoursesById(@PathVariable("id") UUID id) {
-        return userService.getCoursesForUser(id);
+    public List<CourseBasicInfo> getCoursesByUserId(@PathVariable("id") UUID userId) {
+        return userService.getCoursesForUser(userId);
     }
 
     @GetMapping("/join-course/{courseId}")
@@ -167,9 +178,12 @@ public class UserController {
         return userService.findEmployees();
     }
 
+    @GetMapping("/employee/{id}/profile")
+    public EmployeeProfile getEmployeeProfileById(@PathVariable("id") UUID id) {return userService.getEmployeeById(id);}
+
     @GetMapping("/employee/{id}")
-    public EmployeeProfile getEmployeeById(@PathVariable("id") UUID id) {
-        return userService.getEmployeeById(id);
+    public UserDTO getEmployeeById(@PathVariable("id") UUID id) {
+        return new UserDTO(userService.getUser(id));
     }
 
     @PostMapping("/employee")

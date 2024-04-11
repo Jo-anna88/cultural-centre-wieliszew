@@ -26,9 +26,9 @@ import static pl.joannaz.culturalcentrewieliszew.utils.constants.PASSWORD;
 import static pl.joannaz.culturalcentrewieliszew.utils.constants.SIMPLE_TEXT_SHORT;
 
 @Data // for setters and getters
-@Builder // to use Builder design pattern
+//@Builder // to use Builder design pattern
 @NoArgsConstructor
-@AllArgsConstructor // needed for Builder
+//@AllArgsConstructor // needed for Builder
 @Table(
         name="users",
         uniqueConstraints = {
@@ -77,8 +77,8 @@ public class User implements UserDetails
     @OneToMany(
             mappedBy = "participant",
             cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            fetch = FetchType.EAGER
+            orphanRemoval = true//,
+            //fetch = FetchType.EAGER
     )
     //@JsonIgnoreProperties("participant")
     @JsonManagedReference(value="user-course")
@@ -190,11 +190,19 @@ public class User implements UserDetails
     }
 
     public void removeCourse(Course course) {
+        List<UserCourse> ucList = course.getParticipants();
+        UserCourse record = ucList.stream().filter(uc -> uc.getParticipant().getId().equals(this.id)).findFirst().get();
+        course.getParticipants().remove(record);
+        courses.remove(record);
+        record.setParticipant(null);
+        record.setCourse(null);
+        /*
         UserCourse userCourse = new UserCourse(this, course);
         course.getParticipants().remove(userCourse);
         courses.remove(userCourse);
         userCourse.setParticipant(null);
         userCourse.setCourse(null);
+        */
     }
 
 //    public void addCulturalEvent(CulturalEvent culturalEvent) {

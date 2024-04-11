@@ -10,4 +10,9 @@ import lombok.NoArgsConstructor;
 public class CourseBasicInfo {
     private Long id;
     private String name;
+
+    public CourseBasicInfo(Course course) {
+        this.id = course.getId();
+        this.name = course.getName();
+    }
 }

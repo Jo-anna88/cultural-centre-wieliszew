@@ -3,6 +3,7 @@ package pl.joannaz.culturalcentrewieliszew.auth;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -117,13 +118,18 @@ public class AuthController {
 
     @GetMapping("/role")
     public Map<String,String> getUserRole() {
-        Collection<? extends GrantedAuthority> roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
         String role = ""; // if user is not authenticated, it has no role, so this method's response will be this empty string
-        if (!roles.isEmpty()) {
-            SimpleGrantedAuthority sga = (SimpleGrantedAuthority) roles.iterator().next();
-            String authRole = sga.getAuthority().substring(5);
-            if (!authRole.equals("ANONYMOUS")) role = authRole; // when authentication is instanceof AnonymousAuthenticationToken
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (! (authentication instanceof AnonymousAuthenticationToken)) { // UsernamePasswordAuthenticationToken
+            Collection<? extends GrantedAuthority> roles = authentication.getAuthorities();
+            //if (!roles.isEmpty()) {
+                SimpleGrantedAuthority sga = (SimpleGrantedAuthority) roles.iterator().next();
+                role = sga.getAuthority().substring(5);
+            //    if (!authRole.equals("ANONYMOUS"))
+            //        role = authRole; // when authentication is instanceof AnonymousAuthenticationToken
+            //}
         }
+
         Map<String, String> response = new HashMap<>(1);
         response.put("role", role);
         return response;

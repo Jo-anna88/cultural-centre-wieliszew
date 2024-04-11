@@ -25,10 +25,12 @@ public class CourseDTO implements Serializable {
         this.id = course.getId();
         this.imgSource = course.getImgSource();
         this.name = course.getName();
-        this.teacher = new UserBasicInfo(
-                course.getTeacher().getId(),
-                course.getTeacher().getFirstName(),
-                course.getTeacher().getLastName());
+        if(course.getTeacher() != null) {
+            this.teacher = new UserBasicInfo(
+                    course.getTeacher().getId(),
+                    course.getTeacher().getFirstName(),
+                    course.getTeacher().getLastName());
+        }
         this.description = course.getDescription();
         this.category = course.getCategory();
         this.maxParticipantsNumber = course.getMaxParticipantsNumber();

@@ -3,6 +3,7 @@ package pl.joannaz.culturalcentrewieliszew.course;
 import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import pl.joannaz.culturalcentrewieliszew.linkEntities.UserCourse;
 import pl.joannaz.culturalcentrewieliszew.user.User;
 
@@ -16,6 +17,7 @@ import java.util.List;
 @Table(name="course")
 @Entity(name="Course")
 @Data
+@NoArgsConstructor
 //@JsonIgnoreProperties({"hibernateLazyInitializer"}) // for Unidirectional association for api/classes/{id}/details if we want to have course object nested in course details
 //@JsonIdentityInfo( // for Bi-directional @OneToOne/@ManyToMany association (to remove recursion in JSON mapper)
 //        generator = ObjectIdGenerators.PropertyGenerator.class,
@@ -31,11 +33,6 @@ public class Course {
     )
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "course_seq")
     */
-    @Column(
-         name = "id",
-         nullable = false,
-         updatable = false
-    )
     private Long id;
 
     @Column(
@@ -80,8 +77,6 @@ public class Course {
     //@JsonIgnoreProperties("course")
     @JsonManagedReference(value="course-user")
     private List<UserCourse> participants = new ArrayList<>(maxParticipantsNumber);
-
-    public Course() {}
 
     public Course(String imgSource, String name, String description, int maxParticipantsNumber) {
         this.imgSource = imgSource;

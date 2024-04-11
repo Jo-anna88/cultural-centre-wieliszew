@@ -1,6 +1,7 @@
 package pl.joannaz.culturalcentrewieliszew.course;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -44,4 +45,11 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     @Query("SELECT new pl.joannaz.culturalcentrewieliszew.course.CourseBasicInfo(c.id, c.name)" +
     "FROM Course c WHERE c.teacher.id = :teacherId")
     List<CourseBasicInfo> findCourseNamesByTeacherId(@Param("teacherId") UUID teacherId);
+
+    @Query("SELECT c FROM Course c WHERE c.teacher.id = :teacherId")
+    List<Course> findTeacherCourses(@Param("teacherId") UUID teacherId);
+
+    @Modifying
+    @Query("DELETE FROM UserCourse uc where uc.course.id = :courseId")
+    void deleteFromUserCourse(@Param("courseId") Long courseId);
 }
