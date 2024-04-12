@@ -1,5 +1,8 @@
 package pl.joannaz.culturalcentrewieliszew.user;
 
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -7,17 +10,19 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import pl.joannaz.culturalcentrewieliszew.course.CourseBasicInfo;
-import pl.joannaz.culturalcentrewieliszew.course.CourseDTO;
+import pl.joannaz.culturalcentrewieliszew.security.jwt.JWTService;
 
 import java.util.*;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping(path="/api/user")
 public class UserController {
 
     private final UserService userService;
-
-    public UserController(UserService userService) { this.userService = userService; }
+    private final JWTService jwtService;
+    @Value("${jwtCookieName}")
+    private String jwtCookieName; // = "jwt";
 
     @PutMapping()
     public UserDTO updateClient(@RequestBody UserDTO updatedClient) {
@@ -25,8 +30,10 @@ public class UserController {
     }
 
     @DeleteMapping()
-    public void deleteClient() {
+    public void deleteClient(HttpServletResponse response) {
         this.userService.deleteClientAccount();
+        response.addCookie(jwtService.cleanJwtCookie(jwtCookieName));
+        SecurityContextHolder.getContext().setAuthentication(null);
     }
 //    @GetMapping
 //    public List<User> getUsers() {
@@ -150,18 +157,19 @@ public class UserController {
         return userService.getCoursesForUser(userId);
     }
 
-    @GetMapping("/join-course/{courseId}")
-    public void joinCourse(@PathVariable("courseId") Long courseId) {
+    @GetMapping("/join-course/{courseId}/{userId}")
+    public void joinCourse(@PathVariable("courseId") Long courseId, @PathVariable("userId") UUID userId) {
         try {
-            userService.addCourse(courseId);
+            userService.joinCourse(courseId, userId);
         } catch (DataIntegrityViolationException e) {
-            throw new RuntimeException("You are already enrolled for this class.");
+            throw new RuntimeException("Such user is already enrolled for this class.");
         }
     }
 
-    @GetMapping("/join-course/{courseId}/{userId}")
-    public void joinCourseByUserId(@PathVariable("courseId") Long courseId, @PathVariable("userId") UUID userId) {
-        userService.joinCourseByUserId(courseId, userId);
+
+    @DeleteMapping("/withdraw-from-course/{courseId}/{userId}")
+    public void withdrawFromCourse(@PathVariable("courseId") Long courseId, @PathVariable("userId") UUID userId) {
+        userService.removeCourse(courseId, userId);
     }
 
     // Teacher endpoint:

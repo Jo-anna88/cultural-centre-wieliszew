@@ -123,7 +123,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public void joinCourseByUserId(Long courseId, UUID userId) {
+    public void joinCourse(Long courseId, UUID userId) {
         Course course = this.courseRepository.findById(courseId).orElseThrow(() ->
                 new NoSuchElementException(String.format("Course with id %s not found.", courseId))
         );
@@ -144,6 +144,17 @@ public class UserService implements UserDetailsService {
 //        int age = Period.between(dob, LocalDate.now()).getYears();
 //        return age >= minAge && age <= maxAge;
 //    }
+
+    @Transactional
+    public void removeCourse(Long courseId, UUID userId) {
+        Course course = this.courseRepository.findById(courseId).orElseThrow(() ->
+                new NoSuchElementException(String.format("Course with id %s not found.", courseId))
+        );
+        User user = this.userRepository.findById(userId).orElseThrow(() ->
+                new NoSuchElementException(String.format("User with id %s not found.", userId))
+        );
+        user.removeCourse(course);
+    }
 
     public List<UserBasicInfo> findTeachers() {
         return userRepository.findTeachers();
@@ -201,7 +212,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public User updateClient(UserDTO updatedClient) {
+    public User updateClient(UserDTO updatedClient) { // todo: what about: 1. username - no!, 2. children username - no!, 3. children contact phone - only if child contact phone was parent's phone
         User originalClient = this.getCurrentUser();
         originalClient.setFirstName(updatedClient.getFirstName());
         originalClient.setLastName(updatedClient.getLastName());

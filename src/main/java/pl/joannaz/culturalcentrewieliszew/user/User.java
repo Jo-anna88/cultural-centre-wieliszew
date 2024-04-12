@@ -9,6 +9,7 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.transaction.annotation.Transactional;
 import pl.joannaz.culturalcentrewieliszew.course.Course;
 //import pl.joannaz.culturalcentrewieliszew.course.CourseDetails;
 //import pl.joannaz.culturalcentrewieliszew.culturalEvent.CulturalEvent;
@@ -77,8 +78,7 @@ public class User implements UserDetails
     @OneToMany(
             mappedBy = "participant",
             cascade = CascadeType.ALL,
-            orphanRemoval = true//,
-            //fetch = FetchType.EAGER
+            orphanRemoval = true
     )
     //@JsonIgnoreProperties("participant")
     @JsonManagedReference(value="user-course")
@@ -196,13 +196,6 @@ public class User implements UserDetails
         courses.remove(record);
         record.setParticipant(null);
         record.setCourse(null);
-        /*
-        UserCourse userCourse = new UserCourse(this, course);
-        course.getParticipants().remove(userCourse);
-        courses.remove(userCourse);
-        userCourse.setParticipant(null);
-        userCourse.setCourse(null);
-        */
     }
 
 //    public void addCulturalEvent(CulturalEvent culturalEvent) {
