@@ -19,37 +19,31 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     // it uses Java Persistence Query Language - JPQL
     Optional<Course> findCourseByName(String name);
 
-    @Query("SELECT c FROM Course c " +
-            "LEFT JOIN CourseDetails cd ON c.id = cd.id " +
-            "LEFT JOIN cd.address a " +
-            "WHERE (:minimumAge IS NULL OR cd.minAge = :minimumAge) " +
-            "AND (:maximumAge IS NULL OR cd.maxAge = :maximumAge) " +
-            "AND (:price IS NULL OR cd.price <= :price)" +
-            "AND (:teacher IS NULL OR c.teacher = :teacher) " +
-            "AND (:category IS NULL OR c.category = :category) " +
-            "AND (:name IS NULL OR c.name = :name) " +
-            "AND (:location IS NULL OR a.city = :location)")
-            //"AND (:date IS NULL OR cd.date = :date)") <- wymaga zmiany formatu daty, np. na dzień, godziny przedpołudniowe/popołudniowe
-
-    List<Course> findCoursesByCriteria(
-            @Param("minimumAge") Integer minimumAge,
-            @Param("maximumAge") Integer maximumAge,
-            @Param("price") BigDecimal price,
-            @Param("teacher") String teacher,
-            @Param("category") Category category,
-            @Param("name") String name,
-            @Param("location") String location
-    );
-
-    //@Query("SELECT c.name FROM Course c WHERE c.teacher.id = :teacherId")
-    @Query("SELECT new pl.joannaz.culturalcentrewieliszew.course.CourseBasicInfo(c.id, c.name)" +
+    @Query("SELECT new pl.joannaz.culturalcentrewieliszew.course.CourseBasicInfo(c.id, c.name) " +
     "FROM Course c WHERE c.teacher.id = :teacherId")
     List<CourseBasicInfo> findCourseNamesByTeacherId(@Param("teacherId") UUID teacherId);
 
     @Query("SELECT c FROM Course c WHERE c.teacher.id = :teacherId")
     List<Course> findTeacherCourses(@Param("teacherId") UUID teacherId);
 
-    @Modifying
-    @Query("DELETE FROM UserCourse uc where uc.course.id = :courseId")
-    void deleteFromUserCourse(@Param("courseId") Long courseId);
+    @Query("SELECT c FROM Course c " +
+            "LEFT JOIN CourseDetails cd ON c.id = cd.id " +
+            "LEFT JOIN cd.address a " +
+            "WHERE (:minimumAge IS NULL OR cd.minAge >= :minimumAge) " +
+            "AND (:maximumAge IS NULL OR cd.maxAge <= :maximumAge) " +
+            "AND (:price IS NULL OR cd.price <= :price)" +
+            "AND (cast(:teacherId as uuid) IS NULL OR c.teacher.id = :teacherId) " +
+            "AND (:category IS NULL OR c.category = :category) " +
+            "AND (:name IS NULL OR c.name = :name) " +
+            "AND (:location IS NULL OR a.id = :location)"
+    )
+    List<Course> findCoursesByCriteria(
+            @Param("minimumAge") Integer minimumAge,
+            @Param("maximumAge") Integer maximumAge,
+            @Param("price") BigDecimal price,
+            @Param("teacherId") UUID teacherId,
+            @Param("category") Category category,
+            @Param("name") String name,
+            @Param("location") Integer location
+    );
 }

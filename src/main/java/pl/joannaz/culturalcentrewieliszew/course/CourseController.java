@@ -81,14 +81,16 @@ public class CourseController {
     }
 
     @GetMapping("/search")
-    public List<CourseDTO> searchCourses(
+    public List<CourseDTO> searchCourses(HttpServletResponse response,
             @RequestParam(required = false) Integer minAge,
             @RequestParam(required = false) Integer maxAge,
             @RequestParam(required = false) BigDecimal price,
-            @RequestParam(required = false) String teacher,
+            @RequestParam(required = false) UUID teacher,
             @RequestParam(required = false) Category category,
             @RequestParam(required = false) String name,
-            @RequestParam(required = false) String location) {
+            @RequestParam(required = false) Integer location) {
+        //response.setStatus(500);
+        //return null;
         return courseService.findCoursesByCriteria(minAge, maxAge, price, teacher, category, name, location);
     }
 

@@ -185,8 +185,7 @@ public class CourseService {
     }
 
     public List<CourseDTO> findCoursesByCriteria(
-            Integer minAge, Integer maxAge, BigDecimal price, String teacher, Category category, String name, String location) {
-
+            Integer minAge, Integer maxAge, BigDecimal price, UUID teacher, Category category, String name, Integer location) {
         return courseRepository.findCoursesByCriteria(minAge, maxAge, price, teacher, category, name, location).stream()
                 .map(CourseDTO::new)
                 .collect(Collectors.toList());
