@@ -65,7 +65,6 @@ public class CourseController {
 
     @DeleteMapping("/{id}")
     public Long deleteCourse(@PathVariable("id") Long id) { // UUID
-        System.out.println("deleteCourse: " + id);
         return courseService.deleteCourse(id);
     }
 

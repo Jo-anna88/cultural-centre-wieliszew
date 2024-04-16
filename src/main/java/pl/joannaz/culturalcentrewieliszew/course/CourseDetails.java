@@ -59,6 +59,4 @@ public class CourseDetails {
         // address set with usage of setter
         // course cannot be changed
     }
-
-    // helper/utility methods for associations:
 }
