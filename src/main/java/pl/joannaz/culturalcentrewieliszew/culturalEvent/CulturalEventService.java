@@ -38,7 +38,7 @@ public class CulturalEventService {
         //log.info("Saving new cultural event: {} to the database", culturalEventDTO.getName());
         CulturalEvent culturalEvent = new CulturalEvent(culturalEventDTO);
         culturalEvent.setAddress(getAddressById(culturalEventDTO.getLocation().getId()));
-        return new CulturalEventDTO(culturalEventRepository.save(new CulturalEvent(culturalEventDTO)));
+        return new CulturalEventDTO(culturalEventRepository.save(culturalEvent));
     }
 
     @Transactional
