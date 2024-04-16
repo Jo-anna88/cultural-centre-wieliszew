@@ -5,24 +5,24 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import pl.joannaz.culturalcentrewieliszew.address.Address;
-import pl.joannaz.culturalcentrewieliszew.linkEntities.UserCulturalEvent;
-import pl.joannaz.culturalcentrewieliszew.user.User;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
-@Data // for setters and getters
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name="CulturalEvent")
 public class CulturalEvent {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String imgSource;
     private String name;
-    private String date;
+    private LocalDate date;
+    @Column(columnDefinition = "TEXT")
     private String description;
+    private BigDecimal price;
     @ManyToOne(fetch = FetchType.LAZY)  // "By default, @ManyToOne associations use the FetchType.EAGER strategy, which can lead to N+1 query issues or fetching more data than necessary"
     @JoinColumn(name = "address_id",
             foreignKey = @ForeignKey(name = "ADDRESS_ID_FK")
@@ -34,6 +34,16 @@ public class CulturalEvent {
         this.name = culturalEventDTO.getName();
         this.date = culturalEventDTO.getDate();
         this.description = culturalEventDTO.getDescription();
+        this.price = culturalEventDTO.getPrice();
         // address set with usage of setter
+    }
+
+    public CulturalEvent(String imgSource, String name, String date, String description, BigDecimal price, Address address) {
+        this.imgSource = imgSource;
+        this.name = name;
+        this.date = LocalDate.parse(date);
+        this.description = description;
+        this.price = price;
+        this.address = address;
     }
 }

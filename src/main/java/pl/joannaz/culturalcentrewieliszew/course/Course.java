@@ -36,15 +36,13 @@ public class Course {
     private Long id;
 
     @Column(
-            name="img_source",
-            columnDefinition = "TEXT"
+            name="img_source"
     )
     private String imgSource;
 
     @Column(
             name="name",
             nullable = false,
-            columnDefinition = "TEXT",
             unique = true
     )
     private String name;

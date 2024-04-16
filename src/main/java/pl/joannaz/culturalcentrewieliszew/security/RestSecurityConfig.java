@@ -62,6 +62,7 @@ public class RestSecurityConfig { // import org.springframework.security.config.
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/classes/**").permitAll()
+                        .requestMatchers("/api/events/**").permitAll()
                         .requestMatchers("/api/user/**").permitAll() // just for testing
                         .requestMatchers(HttpMethod.GET,"/api/address/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/contact").permitAll()

@@ -56,6 +56,7 @@ public class User implements UserDetails
     @Enumerated(EnumType.STRING)
     private Role role; // in this app user can have only one role
     private String position;
+    @Column(columnDefinition = "TEXT")
     private String description; // employee description
     // or:
     // @ManyToMany(fetch = FetchType.EAGER)
