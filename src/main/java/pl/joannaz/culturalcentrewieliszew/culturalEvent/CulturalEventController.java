@@ -20,8 +20,8 @@ public class CulturalEventController {
         //return null;
     }
 
-    @GetMapping("/{id}")
-    public CulturalEventDTO getCulturalEventById(@PathVariable("id") Long id) { // UUID id
+    @GetMapping("/{id}/details")
+    public CulturalEventDTO getCulturalEventById(@PathVariable("id") Long id) {
         return culturalEventService.getCulturalEventById(id);
     }
 
