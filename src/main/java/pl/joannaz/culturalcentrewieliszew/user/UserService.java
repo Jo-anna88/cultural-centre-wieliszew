@@ -1,5 +1,6 @@
 package pl.joannaz.culturalcentrewieliszew.user;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -9,24 +10,22 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.joannaz.culturalcentrewieliszew.course.*;
 import pl.joannaz.culturalcentrewieliszew.linkEntities.UserCourse;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.*;
 
+@RequiredArgsConstructor
 @Service
 public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
-
-    public UserService (UserRepository userRepository, CourseRepository courseRepository) {
-        this.userRepository = userRepository;
-        this.courseRepository = courseRepository;
-    }
+    private final CourseDetailsRepository courseDetailsRepository;
 
     public void addUser(User user) {
         // set headshot
         user.setHeadshot(UserHelper.isFemale(user.getFirstName()) ? "assets/images/avatar4.svg" : "assets/images/avatar3.svg");
         this.userRepository.save(user);
     }
-
 
     public Optional<User> findUserByUsername(String username) {return this.userRepository.findByUsername(username);}
     public boolean existsByUsername(String username) {return this.userRepository.existsByUsername(username);}
@@ -124,26 +123,36 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public void joinCourse(Long courseId, UUID userId) {
+        // get course
         Course course = this.courseRepository.findById(courseId).orElseThrow(() ->
                 new NoSuchElementException(String.format("Course with id %s not found.", courseId))
         );
+        // get course details to check if user age match minAge and maxAge values
+        CourseDetails courseDetails = courseDetailsRepository.findById(courseId).orElseThrow(() ->
+                new NoSuchElementException(
+                        String.format("Course Details with id %s not found.", courseId)
+                ));
+        // get user
         User user = this.userRepository.findById(userId).orElseThrow(() ->
                 new NoSuchElementException(String.format("User with id %s not found.", userId))
         );
+
+        // check if there is free slot for new participant
         if (course.getParticipants().size() < course.getMaxParticipantsNumber()) {
-//            if (isAgeCorrect(child.getDob(), courseDetails.getMinAge(), courseDetails.getMaxAge()))
-            user.addCourse(course);
-//            else throw new RuntimeException("Sorry, your age does not fit within the age range of this course.");
+            // check if user age match minAge and maxAge values
+            if (isAgeCorrect(user.getDob(), courseDetails.getMinAge(), courseDetails.getMaxAge())) {
+                // join course
+                user.addCourse(course);
+            }
+            else { throw new RuntimeException("Sorry, your age does not fit within the age range of this course."); }
         }
-        else {
-            throw new RuntimeException("Sorry, there is no more available slots for this course.");
-        }
+        else { throw new RuntimeException("Sorry, there is no more available slots for this course."); }
     }
 
-//    public boolean isAgeCorrect(LocalDate dob, int minAge, int maxAge) {
-//        int age = Period.between(dob, LocalDate.now()).getYears();
-//        return age >= minAge && age <= maxAge;
-//    }
+    public boolean isAgeCorrect(LocalDate dob, int minAge, int maxAge) {
+        int age = Period.between(dob, LocalDate.now()).getYears();
+        return age >= minAge && age <= maxAge;
+    }
 
     @Transactional
     public void removeCourse(Long courseId, UUID userId) {
