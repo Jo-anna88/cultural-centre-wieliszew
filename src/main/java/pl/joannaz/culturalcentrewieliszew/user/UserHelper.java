@@ -28,6 +28,7 @@ public class UserHelper {
     }
 
     protected static String updateChildUsername(String oldUsername, String firstName, String lastName) {
+        logger.info("Updating child's username: {}", oldUsername);
         String parentUsername = oldUsername.split("/")[0];
         return UserHelper.createChildUsername(parentUsername, firstName, lastName);
     }

@@ -66,11 +66,11 @@ public class CulturalEventService {
 
     @Transactional
     public Long deleteCulturalEvent(Long id) {
-        logger.info("Checking if Cultural Event with id: {} exist.", id);
+        logger.info("Checking if Cultural Event with id: {} exists.", id);
         boolean culturalEventExists = culturalEventRepository.existsById(id);
         if (!culturalEventExists) {
             logger.error("Cultural Event with id: {} not found.", id);
-            throw new EntityNotFoundException(String.format("Cultural Event with id %s not exist.", id));
+            throw new EntityNotFoundException(String.format("Cultural Event with id %s does not exist.", id));
         }
 
         logger.info("Deleting Course Event with id: {}", id);

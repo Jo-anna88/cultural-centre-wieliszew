@@ -123,7 +123,7 @@ public class CourseService {
             throw new EntityNotFoundException(String.format("Course with id %s does not exist.", id));
         }
 
-        logger.info("Checking if course details with id: {} exist.", id);
+        logger.info("Checking if course details with id: {} exists.", id);
         boolean detailsExists = detailsRepository.existsById(id);
         if (detailsExists) {
             logger.info("Deleting course details with id: {}", id);
@@ -183,11 +183,11 @@ public class CourseService {
     }
 
     public Long deleteCourseDetails(Long id) {
-        logger.info("Checking if course details with id: {} exist.", id);
-        boolean detailsExist = detailsRepository.existsById(id);
-        if (!detailsExist) {
+        logger.info("Checking if course details with id: {} exists.", id);
+        boolean detailsExists = detailsRepository.existsById(id);
+        if (!detailsExists) {
             logger.error("Course details with id: {} not found.", id);
-            throw new EntityNotFoundException(String.format("Course details with id %s not exist.", id));
+            throw new EntityNotFoundException(String.format("Course details with id %s does not exist.", id));
         }
 
         logger.info("Deleting course details with id: {}", id);
