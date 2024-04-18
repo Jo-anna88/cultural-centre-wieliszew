@@ -166,78 +166,107 @@ public class UserService implements UserDetailsService {
         // check if there is free slot for new participant
         logger.info("Checking whether there are free slots for {} course.", course.getName());
         if (course.getParticipants().size() < course.getMaxParticipantsNumber()) {
-            logger.info("Validating age");
             // check if user age match minAge and maxAge values
+            logger.info("Validating age");
             if (isAgeCorrect(user.getDob(), courseDetails.getMinAge(), courseDetails.getMaxAge())) {
                 // join course
+                logger.info("Joining user {} {} to the {} course.", user.getFirstName(), user.getLastName(), course.getName());
                 user.addCourse(course);
             }
-            else { throw new RuntimeException("Sorry, your age does not fit within the age range of this course."); }
+            else {
+                logger.error("User age does not match course's age constraints.");
+                throw new RuntimeException("Sorry, your age does not fit within the age range of this course.");
+            }
         }
-        else { throw new RuntimeException("Sorry, there is no more available slots for this course."); }
+        else {
+            logger.error("There is no free slots for the {} course.", course.getName());
+            throw new RuntimeException("Sorry, there is no more available slots for this course.");
+        }
     }
 
     public boolean isAgeCorrect(LocalDate dob, int minAge, int maxAge) {
         int age = Period.between(dob, LocalDate.now()).getYears();
+        logger.info("User age: {}, course min age: {}, course max age: {}", age, minAge, maxAge);
         return age >= minAge && age <= maxAge;
     }
 
     @Transactional
     public void removeCourse(Long courseId, UUID userId) {
-        Course course = this.courseRepository.findById(courseId).orElseThrow(() ->
-                new EntityNotFoundException(String.format("Course with id %s not found.", courseId))
-        );
-        User user = this.userRepository.findById(userId).orElseThrow(() ->
-                new EntityNotFoundException(String.format("User with id %s not found.", userId))
-        );
+        logger.info("Fetching course with id: {}", courseId);
+        Course course = this.courseRepository.findById(courseId).orElseThrow(() -> {
+            logger.error("Error during fetching course with id: {}", courseId);
+            return new EntityNotFoundException(String.format("Course with id %s not found.", courseId));
+        });
+
+        logger.info("Fetching user with id: {}", userId);
+        User user = this.userRepository.findById(userId).orElseThrow(() -> {
+            logger.error("Error during fetching user with id: {}", userId);
+            return new EntityNotFoundException(String.format("User with id %s not found.", userId));
+        });
+
+        logger.info("Removing {} course for user with id: {}", course.getName(), user.getId());
         user.removeCourse(course);
     }
 
     public List<UserBasicInfo> findTeachers() {
+        logger.info("Fetching all teachers");
         return userRepository.findTeachers();
     }
 
     public List<EmployeeProfile> findEmployees() {
+        logger.info("Fetching all employees");
         return userRepository.findEmployees();
     }
 
     public List<UserBasicInfo> getChildrenSimpleData(UUID id) {
+        logger.info("Fetching children for user with id: {}.", id);
         return userRepository.findChildrenBasicInfo(id);
     }
 
     public EmployeeProfile getEmployeeById(UUID id) {
-        User employee = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        String.format("Employee with id %s does not exist.", id)
-                ));
+        logger.info("Fetching employee with id: {}.", id);
+        User employee = this.userRepository.findById(id).orElseThrow(() -> {
+            logger.error("Error during fetching employee with id: {}", id);
+            return new EntityNotFoundException(String.format("Employee with id %s not found.", id));
+        });
+
         return new EmployeeProfile(id, employee.getFirstName(), employee.getLastName(),
                 employee.getHeadshot(), employee.getPosition(), employee.getDescription());
     }
 
     @Transactional
     public void deleteEmployee(UUID employeeId) {
-        User employee = userRepository.findById(employeeId)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        String.format("Employee with id %s does not exist.", employeeId)
-                ));
+        logger.info("Fetching employee with id: {}.", employeeId);
+        User employee = this.userRepository.findById(employeeId).orElseThrow(() -> {
+            logger.error("Error during fetching employee with id: {}", employeeId);
+            return new EntityNotFoundException(String.format("Employee with id %s not found.", employeeId));
+        });
+
         if(employee.getPosition().equals("Teacher")) { // get teacher courses and set teacher value to null
+            logger.info("Fetching courses led by teacher: {} {}.", employee.getFirstName(), employee.getLastName());
             List<Course> courses = this.courseRepository.findTeacherCourses(employeeId);
+            logger.info("Removing teacher for all courses led by: {} {}.", employee.getFirstName(), employee.getLastName());
             courses.forEach(course -> course.setTeacher(null));
         }
+
+        logger.info("Deleting employee with id: {}.", employeeId);
         userRepository.deleteById(employeeId);
     }
 
     public User addEmployee(UserDTO employee) {
+        logger.info("Adding employee: {} {} to the database.", employee.getFirstName(), employee.getLastName());
         User newEmployee = UserHelper.createEmployee(employee);
         return userRepository.save(newEmployee);
     }
 
     @Transactional
     public User updateEmployee(UserDTO updatedEmployee) {
-        User originalEmployee = userRepository.findById(updatedEmployee.getId())
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Employee with this id does not exist."
-                ));
+        logger.info("Fetching employee with id: {}.", updatedEmployee.getId());
+        User originalEmployee = userRepository.findById(updatedEmployee.getId()).orElseThrow(() -> {
+            logger.error("Error during fetching employee with id: {}", updatedEmployee.getId());
+            return new EntityNotFoundException(String.format("Employee with id %s not found.", updatedEmployee.getId()));
+        });
+
         originalEmployee.setFirstName(updatedEmployee.getFirstName());
         originalEmployee.setLastName(updatedEmployee.getLastName());
         originalEmployee.setPhone(updatedEmployee.getPhone());
@@ -245,16 +274,21 @@ public class UserService implements UserDetailsService {
         originalEmployee.setRole(updatedEmployee.getRole());
         originalEmployee.setPosition(updatedEmployee.getPosition());
         originalEmployee.setDescription(updatedEmployee.getDescription());
+
+        logger.info("Saving updated employee: {} {}.", originalEmployee.getFirstName(), originalEmployee.getLastName());
         return this.userRepository.save(originalEmployee);
     }
 
     @Transactional
-    public User updateClient(UserDTO updatedClient) { // todo: what about: 1. username - no!, 2. children username - no!, 3. children contact phone - only if child contact phone was parent's phone
+    public User updateClient(UserDTO updatedClient) {
         User originalClient = this.getCurrentUser();
+
         originalClient.setFirstName(updatedClient.getFirstName());
         originalClient.setLastName(updatedClient.getLastName());
         originalClient.setPhone(updatedClient.getPhone());
         originalClient.setDob(updatedClient.getDob());
+
+        logger.info("Saving updated client: {} {}.", updatedClient.getFirstName(), updatedClient.getLastName());
         return this.userRepository.save(originalClient);
     }
 
@@ -264,9 +298,11 @@ public class UserService implements UserDetailsService {
 
         // check if user has children and remove children accounts
         List<User> children = this.getChildren(currentUser.getId());
+        logger.info("Removing children for user with id: {}.", currentUser.getId());
         children.forEach(child -> this.deleteChild(child.getId()));
 
         // remove user account (corresponding rows in UserCourse should be deleted automatically)
+        logger.info("Removing account of client with id: {}.", currentUser.getId());
         this.userRepository.deleteById(currentUser.getId());
     }
 }

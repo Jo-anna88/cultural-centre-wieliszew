@@ -2,6 +2,8 @@ package pl.joannaz.culturalcentrewieliszew.user;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -23,6 +25,7 @@ public class UserController {
     private final JWTService jwtService;
     @Value("${jwtCookieName}")
     private String jwtCookieName; // = "jwt";
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @PutMapping()
     public UserDTO updateClient(@RequestBody UserDTO updatedClient) {
@@ -35,22 +38,7 @@ public class UserController {
         response.addCookie(jwtService.cleanJwtCookie(jwtCookieName));
         SecurityContextHolder.getContext().setAuthentication(null);
     }
-//    @GetMapping
-//    public List<User> getUsers() {
-//        return List.of(new User(UUID.randomUUID(), "name", "aaa@o2.pl"));
-//    }
-    /*
-    public List<UserDTO> getAllUsers() {
-        return userRepository.findAll().parallelStream().map(user -> new UserDTO(user)).collect(Collectors.toList());
-    }
-     */
-    /*
-    ***save a new user***
-    * Use a strong hashing algorithm like BCrypt *
-    String encodedPassword = passwordEncoder.encode(rawPassword);
-    user.setPassword(encodedPassword);
-    userRepository.save(user);
-     */
+
     @GetMapping("/profile")
     public UserDTO getUserProfile() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -63,23 +51,6 @@ public class UserController {
         }
         throw new RuntimeException("cannot get current user's profile");
     }
-
-//    @GetMapping("/full-name") // user's full name
-//    public Map<String,String> getFullName() {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        User currentUser;
-//        // Check if the authentication object is not null and is an instance of UserDetails
-//        //if(!(authentication instanceof AnonymousAuthenticationToken))
-//        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
-//            // Cast the principal to User
-//            currentUser = (User) authentication.getPrincipal();
-//            Map<String,String> response = new HashMap<>(2);
-//            response.put("firstName", currentUser.getFirstName());
-//            response.put("lastName", currentUser.getLastName());
-//            return response;
-//        }
-//        throw new RuntimeException("cannot get current user's name and surname");
-//    }
 
     @GetMapping("/user-simple")
     public UserBasicInfo getUserSimpleData() {
@@ -162,6 +133,7 @@ public class UserController {
         try {
             userService.joinCourse(courseId, userId);
         } catch (DataIntegrityViolationException e) {
+
             throw new RuntimeException("Such user is already enrolled for this class.");
         }
     }
@@ -187,7 +159,9 @@ public class UserController {
     }
 
     @GetMapping("/employee/{id}/profile")
-    public EmployeeProfile getEmployeeProfileById(@PathVariable("id") UUID id) {return userService.getEmployeeById(id);}
+    public EmployeeProfile getEmployeeProfileById(@PathVariable("id") UUID id) {
+        return userService.getEmployeeById(id);
+    }
 
     @GetMapping("/employee/{id}")
     public UserDTO getEmployeeById(@PathVariable("id") UUID id) {
