@@ -41,6 +41,7 @@ public class UserController {
 
     @GetMapping("/profile")
     public UserDTO getUserProfile() {
+        logger.info("Fetching logged in user's profile.");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         // Check if the authentication object is not null and is an instance of UserDetails
@@ -48,35 +49,42 @@ public class UserController {
         if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
             // Cast the principal to User
             return new UserDTO((User) authentication.getPrincipal());
+        } else {
+            logger.error("Unexpected error occurred during fetching logged in user's profile.");
+            throw new RuntimeException("Cannot get current user's profile - unexpected error occurred.");
         }
-        throw new RuntimeException("cannot get current user's profile");
     }
 
     @GetMapping("/user-simple")
     public UserBasicInfo getUserSimpleData() {
+        logger.info("Fetching logged in user's simple data.");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if(!(authentication instanceof AnonymousAuthenticationToken)) {
             User currentUser = (User) authentication.getPrincipal();
             return new UserBasicInfo(currentUser.getId(), currentUser.getFirstName(), currentUser.getLastName());
         } else {
-            throw new RuntimeException("Cannot get children data for this user.");
+            logger.error("Unexpected error occurred during fetching logged in user's simple data.");
+            throw new RuntimeException("Cannot get user simple data for current user.");
         }
     }
 
     // User's children endpoints:
     @GetMapping("/children-simple")
     public List<UserBasicInfo> getChildrenSimpleData(){
+        logger.info("Fetching logged in user and his/her children's simple data.");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if(!(authentication instanceof AnonymousAuthenticationToken)) {
             UUID id = ((User) authentication.getPrincipal()).getId();
             return userService.getChildrenSimpleData(id);
         } else {
+            logger.error("Unexpected error occurred during fetching children's simple data for logged in user.");
             throw new RuntimeException("Cannot get children data for this user.");
         }
     }
 
     @GetMapping("/children")
     public List<UserDTO> getChildrenByParentId() {
+        logger.info("Fetching logged in user and his/her children.");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
             UUID parentId = ((User) authentication.getPrincipal()).getId();
@@ -86,18 +94,23 @@ public class UserController {
                 childrenDTO.add(new UserDTO(child));
             }
             return childrenDTO;
+        } else {
+            logger.error("Unexpected error occurred during fetching children for logged in user.");
+            throw new RuntimeException("Cannot get list of children.");
         }
-        throw new RuntimeException("cannot get list of children");
     }
     @PostMapping("/child")
     public UserDTO addChild(@RequestBody User child) {
+        logger.info("Fetching logged in user to add a new child.");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
             User parentUser = (User) authentication.getPrincipal();
             User newChild = userService.addChild(parentUser, child);
             return new UserDTO(newChild);
+        } else {
+            logger.error("Unexpected error occurred during fetching children");
+            throw new RuntimeException("Cannot add a child.");
         }
-        throw new RuntimeException("cannot add a child");
     }
 
     @PutMapping("/child")
@@ -133,7 +146,7 @@ public class UserController {
         try {
             userService.joinCourse(courseId, userId);
         } catch (DataIntegrityViolationException e) {
-
+            logger.info("User with id: {} is already enrolled for the class with id: {}", userId, courseId);
             throw new RuntimeException("Such user is already enrolled for this class.");
         }
     }
