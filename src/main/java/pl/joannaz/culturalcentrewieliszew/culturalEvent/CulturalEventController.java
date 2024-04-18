@@ -13,9 +13,9 @@ public class CulturalEventController {
     private final CulturalEventService culturalEventService;
 
     @GetMapping
-    public List<CulturalEventDTO> getAllCourses(HttpServletResponse response) throws InterruptedException {
+    public List<CulturalEventDTO> getAllCulturalEvents(HttpServletResponse response) throws InterruptedException {
         //Thread.sleep(3000); // to check dealing with slow REST responses
-        return culturalEventService.getAllCourses();
+        return culturalEventService.getAllCulturalEvents();
         //response.setStatus(500);
         //return null;
     }

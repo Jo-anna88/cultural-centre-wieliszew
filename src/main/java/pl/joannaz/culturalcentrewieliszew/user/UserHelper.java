@@ -1,21 +1,29 @@
 package pl.joannaz.culturalcentrewieliszew.user;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pl.joannaz.culturalcentrewieliszew.utils.Utility;
 
 public class UserHelper {
+    private static final Logger logger = LoggerFactory.getLogger(UserHelper.class);
+
     protected static String createEmployeeUsername(String firstName, String lastName) {
+        logger.info("Creating employee username for {} {}.", firstName, lastName);
         StringBuilder str = new StringBuilder(Utility.removeDiacritics(firstName.toLowerCase()));
         str.append(".");
         str.append(Utility.removeDiacritics(lastName.toLowerCase()));
         str.append("@ccw.pl");
+        logger.info("Created username: {}", str);
         return str.toString();
     }
 
     protected static String createChildUsername(String parentUsername, String firstName, String lastName) {
+        logger.info("Creating child username for {} {} whose parent's username is {}.", firstName, lastName, parentUsername);
         StringBuilder str = new StringBuilder(parentUsername);
         str.append("/");
         str.append(Utility.removeDiacritics(firstName));
         str.append(Utility.removeDiacritics(lastName));
+        logger.info("Created username: {}", str);
         return str.toString();
     }
 

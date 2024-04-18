@@ -36,9 +36,12 @@ public class JWTService {
         publicKey = (RSAPublicKey)keyPair.getPublic();
         // for testing/debugging purposes:
         String encodedPublicKey = Base64.getEncoder().encodeToString(publicKey.getEncoded());
+        logger.debug("Encoded public key: {}", encodedPublicKey);
         String encodedPrivateKey = Base64.getEncoder().encodeToString(privateKey.getEncoded());
+        logger.debug("Encoded private key: {}", encodedPrivateKey);
     }
     public String generateToken(String username) {
+        logger.info("Generating JWT token");
         long currentTimeMs = System.currentTimeMillis();
         return Jwts.builder()
                 .setIssuedAt(new Date(currentTimeMs))
@@ -49,6 +52,7 @@ public class JWTService {
     }
 
     public Cookie generateJwtCookie(String cookieName, String cookieValue) {
+        logger.info("Generating JWT cookie");
         Cookie jwtCookie = new Cookie(cookieName, cookieValue);
         jwtCookie.setPath("/api");
         jwtCookie.setMaxAge((int) (expTimeMs/1000));
@@ -58,6 +62,7 @@ public class JWTService {
     }
 
     public Cookie cleanJwtCookie(String cookieName) {
+        logger.info("Cleaning JWT cookie");
         Cookie jwtCookie = new Cookie(cookieName, null);
         jwtCookie.setPath("/api");
         jwtCookie.setMaxAge(0);
@@ -97,11 +102,13 @@ public class JWTService {
     */
 
     public String extractUsernameFromToken(String token) {
+        logger.info("Extracting username from token: {}", token);
         return Jwts.parserBuilder().setSigningKey(publicKey).build()
                 .parseClaimsJws(token).getBody().get("name").toString();
     }
 
     public String getJwtCookieValue(HttpServletRequest request) {
+        logger.info("Getting JWT cookie value from request: {}", request);
         Cookie cookie = WebUtils.getCookie(request, jwtCookieName);
         return (cookie != null) ? cookie.getValue() : null;
     }

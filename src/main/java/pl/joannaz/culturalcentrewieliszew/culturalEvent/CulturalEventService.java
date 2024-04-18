@@ -1,6 +1,9 @@
 package pl.joannaz.culturalcentrewieliszew.culturalEvent;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.joannaz.culturalcentrewieliszew.address.Address;
@@ -19,23 +22,23 @@ import java.util.stream.Collectors;
 public class CulturalEventService {
     private final CulturalEventRepository culturalEventRepository;
     private final AddressRepository addressRepository;
-    //private static final Logger log = LoggerFactory.getLogger(CulturalEventService.class);
-    public List<CulturalEventDTO> getAllCourses() {
-        //log.info("Fetching all courses.");
+    private static final Logger logger = LoggerFactory.getLogger(CulturalEventService.class);
+    public List<CulturalEventDTO> getAllCulturalEvents() {
+        logger.info("Fetching all cultural events.");
         return culturalEventRepository.findAll().stream().map(CulturalEventDTO::new).collect(Collectors.toList());
     }
 
     public CulturalEventDTO getCulturalEventById(Long id) {
-        //log.info("Fetching cultural event with id {}.", id);
+        logger.info("Fetching cultural event with id {}.", id);
         return new CulturalEventDTO(culturalEventRepository.findById(id)
                 .orElseThrow(() -> {
-                    //log.error("Error during fetching cultural event with id {}", id);
+                    logger.error("Error during fetching cultural event with id {}", id);
                     return new NoSuchElementException(String.format("Cultural Event with id %s not found.", id));
                 }));
     }
 
     public CulturalEventDTO addCulturalEvent(CulturalEventDTO culturalEventDTO) {
-        //log.info("Saving new cultural event: {} to the database", culturalEventDTO.getName());
+        logger.info("Adding new cultural event: {} to the database", culturalEventDTO.getName());
         CulturalEvent culturalEvent = new CulturalEvent(culturalEventDTO);
         culturalEvent.setAddress(getAddressById(culturalEventDTO.getLocation().getId()));
         return new CulturalEventDTO(culturalEventRepository.save(culturalEvent));
@@ -43,9 +46,13 @@ public class CulturalEventService {
 
     @Transactional
     public CulturalEventDTO updateCulturalEvent(CulturalEventDTO updatedCulturalEventDTO) {
+        logger.info("Fetching Cultural Event: {}.", updatedCulturalEventDTO.getName());
         CulturalEvent originalCulturalEvent = culturalEventRepository.findById(updatedCulturalEventDTO.getId())
-                .orElseThrow(() -> new NoSuchElementException(String.format(
-                        "Cultural Event with id %s not found.", updatedCulturalEventDTO.getId()))
+                .orElseThrow(() -> {
+                    logger.error("Error during fetching Cultural Event: {}.", updatedCulturalEventDTO.getName());
+                    return new EntityNotFoundException(String.format(
+                                    "Cultural Event with id %s not found.", updatedCulturalEventDTO.getId()));
+                    }
                 );
         originalCulturalEvent.setName(updatedCulturalEventDTO.getName());
         originalCulturalEvent.setDate(updatedCulturalEventDTO.getDate());
@@ -53,21 +60,30 @@ public class CulturalEventService {
         if (!Objects.equals(originalCulturalEvent.getAddress().getId(), updatedCulturalEventDTO.getLocation().getId())) {
             originalCulturalEvent.setAddress(getAddressById(updatedCulturalEventDTO.getLocation().getId()));
         }
+        logger.info("Saving updated {} Cultural Event.", updatedCulturalEventDTO.getName());
         return new CulturalEventDTO(culturalEventRepository.save(originalCulturalEvent));
     }
 
     @Transactional
     public Long deleteCulturalEvent(Long id) {
+        logger.info("Checking if Cultural Event with id: {} exist.", id);
         boolean culturalEventExists = culturalEventRepository.existsById(id);
         if (!culturalEventExists) {
-            throw new IllegalStateException(String.format("Cultural Event with id %s not exist.", id));
+            logger.error("Cultural Event with id: {} not found.", id);
+            throw new EntityNotFoundException(String.format("Cultural Event with id %s not exist.", id));
         }
+
+        logger.info("Deleting Course Event with id: {}", id);
         culturalEventRepository.deleteById(id);
         return id;
     }
 
     public Address getAddressById(Integer addressId) {
+        logger.info("Fetching address with id: {}", addressId);
         return addressRepository.findById(addressId)
-                .orElseThrow(() -> new NoSuchElementException(String.format("Location with id %s not found.", addressId)));
+                .orElseThrow(() -> {
+                    logger.error("Error during fetching address with id: {}", addressId);
+                    return new EntityNotFoundException(String.format("Location with id %s not found.", addressId));
+                });
     }
 }

@@ -1,6 +1,8 @@
 package pl.joannaz.culturalcentrewieliszew.user;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -20,6 +22,7 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
     private final CourseDetailsRepository courseDetailsRepository;
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     public void addUser(User user) {
         // set headshot
