@@ -36,9 +36,9 @@ public class JWTService {
         publicKey = (RSAPublicKey)keyPair.getPublic();
         // for testing/debugging purposes:
         String encodedPublicKey = Base64.getEncoder().encodeToString(publicKey.getEncoded());
-        logger.debug("Encoded public key: {}", encodedPublicKey);
+        logger.info("Encoded public key: {}", encodedPublicKey);
         String encodedPrivateKey = Base64.getEncoder().encodeToString(privateKey.getEncoded());
-        logger.debug("Encoded private key: {}", encodedPrivateKey);
+        logger.info("Encoded private key: {}", encodedPrivateKey);
     }
     public String generateToken(String username) {
         logger.info("Generating JWT token");

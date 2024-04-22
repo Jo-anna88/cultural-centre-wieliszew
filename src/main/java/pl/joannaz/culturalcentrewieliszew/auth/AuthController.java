@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -69,11 +70,11 @@ public class AuthController {
         logger.info("Validating new user's username: {} for uniqueness constraint", newUser.getUsername());
         if (userService.existsByUsername(newUser.getUsername())) {
             logger.error("Username with username {} already exists.", newUser.getUsername());
-            throw new Error("Username already exists.");
+            throw new DataIntegrityViolationException("Username already exists.");
             //return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
         }
 
-        // Set password
+        // Set a password
         logger.debug("Encoding user's password: {}", newUser.getPassword());
         String encodedPassword = passwordEncoder.encode(newUser.getPassword());
         logger.debug("Encoded password: {}", encodedPassword);
@@ -115,8 +116,8 @@ public class AuthController {
         logger.info("Checking is user is an authenticated user.");
         Map<String,Boolean> response = new HashMap<>(1);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() != "anonymousUser")
-            {
+        //if (authentication != null && authentication.getPrincipal() != "anonymousUser")
+        if(! (authentication instanceof AnonymousAuthenticationToken)) {
                 response.put("result", authentication.isAuthenticated());
                 return response;
             }

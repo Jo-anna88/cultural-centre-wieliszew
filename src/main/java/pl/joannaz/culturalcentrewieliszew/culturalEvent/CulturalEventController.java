@@ -1,7 +1,10 @@
 package pl.joannaz.culturalcentrewieliszew.culturalEvent;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,16 +16,17 @@ public class CulturalEventController {
     private final CulturalEventService culturalEventService;
 
     @GetMapping
-    public List<CulturalEventDTO> getAllCulturalEvents(HttpServletResponse response) throws InterruptedException {
+    public ResponseEntity<List<CulturalEventDTO>> getAllCulturalEvents(HttpServletResponse response) throws InterruptedException {
         //Thread.sleep(3000); // to check dealing with slow REST responses
-        return culturalEventService.getAllCulturalEvents();
-        //response.setStatus(500);
-        //return null;
+        //List<CulturalEventDTO> culturalEvents = culturalEventService.getAllCulturalEvents();
+        //return ResponseEntity.ok(culturalEvents);
+        response.setStatus(500);
+        return null;
     }
 
     @GetMapping("/{id}")
-    public CulturalEventDTO getCulturalEventById(@PathVariable("id") Long id) {
-        return culturalEventService.getCulturalEventById(id);
+    public ResponseEntity<CulturalEventDTO> getCulturalEventById(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(culturalEventService.getCulturalEventById(id));
     }
 
     @PostMapping()

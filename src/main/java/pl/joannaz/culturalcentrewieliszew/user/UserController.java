@@ -108,7 +108,7 @@ public class UserController {
             User newChild = userService.addChild(parentUser, child);
             return new UserDTO(newChild);
         } else {
-            logger.error("Unexpected error occurred during fetching children");
+            logger.error("Unexpected error occurred during fetching logged in user.");
             throw new RuntimeException("Cannot add a child.");
         }
     }
@@ -147,7 +147,7 @@ public class UserController {
             userService.joinCourse(courseId, userId);
         } catch (DataIntegrityViolationException e) {
             logger.info("User with id: {} is already enrolled for the class with id: {}", userId, courseId);
-            throw new RuntimeException("Such user is already enrolled for this class.");
+            throw new DataIntegrityViolationException("Such user is already enrolled for this class.");
         }
     }
 

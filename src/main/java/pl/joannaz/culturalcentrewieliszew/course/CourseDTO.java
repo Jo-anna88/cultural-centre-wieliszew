@@ -18,8 +18,6 @@ public class CourseDTO implements Serializable {
     private int freeSlots;
 
     public CourseDTO () {}
-    // InvalidDefinitionException: Cannot construct instance of `pl.joannaz.culturalcentrewieliszew.course.CourseDTO` (no Creators, like default constructor, exist)
-    // to fix this error: default constructor or @JsonProperty("field_name")
 
     public CourseDTO (Course course) {
         this.id = course.getId();

@@ -8,12 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.joannaz.culturalcentrewieliszew.address.Address;
 import pl.joannaz.culturalcentrewieliszew.address.AddressRepository;
-import pl.joannaz.culturalcentrewieliszew.course.Course;
-import pl.joannaz.culturalcentrewieliszew.course.CourseDTO;
-import pl.joannaz.culturalcentrewieliszew.course.CourseDetails;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -33,7 +29,7 @@ public class CulturalEventService {
         return new CulturalEventDTO(culturalEventRepository.findById(id)
                 .orElseThrow(() -> {
                     logger.error("Error during fetching cultural event with id {}", id);
-                    return new NoSuchElementException(String.format("Cultural Event with id %s not found.", id));
+                    return new EntityNotFoundException(String.format("Cultural Event with id %s not found.", id));
                 }));
     }
 
