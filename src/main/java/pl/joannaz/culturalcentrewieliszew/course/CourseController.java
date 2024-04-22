@@ -27,12 +27,6 @@ public class CourseController {
         //return null;
     }
 
-    /*
-    public ResponseEntity<List<Course>> getAllCourses() {
-        return ResponseEntity.ok().body(courseService.getAllCourses());
-    }
-     */
-
     @GetMapping("/{id}")
     public CourseDTO getCourseById(@PathVariable("id") Long id) { // UUID id
         return courseService.getCourseById(id);
