@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -36,7 +37,7 @@ public class AuthController {
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @PostMapping(path="/login") // authenticate user
-    public UserBasicInfo login (@RequestBody Map<String,String> credentials, HttpServletResponse response) {
+    public ResponseEntity<UserBasicInfo> login (@RequestBody Map<String,String> credentials, HttpServletResponse response) {
         //credentials - LinkedHashMap, keys: username and password
         logger.info("Fetching user from Security Context Holder");
         Authentication authentication = authManager
@@ -62,7 +63,9 @@ public class AuthController {
 
         response.addCookie(jwtService.generateJwtCookie(jwtCookieName, token));
 
-        return new UserBasicInfo(null, currentUser.getFirstName(), currentUser.getLastName());
+        UserBasicInfo userBasicInfo = new UserBasicInfo(null, currentUser.getFirstName(), currentUser.getLastName());
+
+        return ResponseEntity.ok(userBasicInfo);
     }
 
     @PostMapping(path="/signup") // id=null

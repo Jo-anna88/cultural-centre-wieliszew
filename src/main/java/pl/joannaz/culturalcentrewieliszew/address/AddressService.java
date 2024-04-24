@@ -15,8 +15,9 @@ public class AddressService {
 
     public AddressService(AddressRepository addressRepository) {this.addressRepository = addressRepository;}
     public List<Address> getAddresses() {
-        logger.info("Fetching all courses.");
-        return addressRepository.findAll();
+        throw new RuntimeException("test message");
+        //logger.info("Fetching all courses.");
+        //return addressRepository.findAll();
     }
     public List<Location> getLocations() {
         logger.info("Fetching all locations.");

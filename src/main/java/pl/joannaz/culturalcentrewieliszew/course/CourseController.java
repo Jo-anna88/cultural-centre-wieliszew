@@ -20,11 +20,10 @@ public class CourseController {
     public CourseController(CourseService courseService) { this.courseService = courseService; }
 
     @GetMapping
-    public List<CourseDTO> getAllCourses(HttpServletResponse response) throws InterruptedException {
-         //Thread.sleep(3000); // to check dealing with slow REST responses
-        return courseService.getAllCourses();
-        //response.setStatus(500);
-        //return null;
+    public List<CourseDTO> getAllCourses() throws InterruptedException {
+        // Thread.sleep(3000); // to check dealing with slow REST responses
+         return courseService.getAllCourses();
+        // throw new RuntimeException("test message"); // to check dealing with http error responses
     }
 
     @GetMapping("/{id}")

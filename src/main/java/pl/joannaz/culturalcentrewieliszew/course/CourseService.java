@@ -53,12 +53,14 @@ public class CourseService {
 
     public CourseDetailsDTO getDetailsById (Long id) {
         logger.info("Fetching course details with id {}.", id);
-        return detailsRepository.findById(id)
-                .map(CourseDetailsDTO::new)
-                .orElseThrow(() -> {
-                    logger.error("Error during fetching course details with id {}", id);
-                    return new EntityNotFoundException(String.format("Course Details with id %s not found.", id));
-                });
+        Optional<CourseDetails> optionalDetails = detailsRepository.findById(id);
+        if (optionalDetails.isPresent()) {
+            return new CourseDetailsDTO(optionalDetails.get());
+        } else {
+            logger.warn("There is no course details with id {}", id);
+            logger.error("No course details found for id {}", id);
+            return null; // return null if no course details was found
+        }
     }
 
     public CourseDTO addCourse(CourseDTO courseDTO) {
@@ -71,7 +73,12 @@ public class CourseService {
                     courseDTO.getName());
             newCourse.setTeacher(getTeacherById(courseDTO.getTeacher().getId()));
         }
-        return new CourseDTO(courseRepository.save(newCourse));
+        try {
+            return new CourseDTO(courseRepository.save(newCourse));
+        } catch (DataIntegrityViolationException e) {
+            logger.error(e.getMessage());
+            throw new DataIntegrityViolationException("Course with such a name already exists.");
+        }
     }
 
     public User getTeacherById(UUID teacherId) {
