@@ -36,7 +36,8 @@ public class Course {
     private Long id;
 
     @Column(
-            name="img_source"
+            name="img_source",
+            nullable=false
     )
     private String imgSource;
 

@@ -29,10 +29,10 @@ import static pl.joannaz.culturalcentrewieliszew.utils.constants.SIMPLE_TEXT_SHO
 @Data // for setters and getters
 @NoArgsConstructor
 @Table(
-        name="users",
-        uniqueConstraints = {
-            @UniqueConstraint(columnNames = "username")
-        })
+        name="users"
+//        ,uniqueConstraints = {
+//            @UniqueConstraint(columnNames = "username")}
+        )
 @Entity(name="User")
 //@JsonIdentityInfo( // for Bi-directional @OneToOne association (to remove recursion in JSON mapper)
 //        generator = ObjectIdGenerators.PropertyGenerator.class,
@@ -62,13 +62,15 @@ public class User implements UserDetails
     private String lastName;
 
     @Column(
-            name="phone"
+            name="phone",
+            nullable = false
     )
     private String phone;
 
     @Column(
             name="username",
-            nullable = false
+            nullable = false,
+            unique = true
     )
     private String username; // e.g. email, login
 
@@ -160,11 +162,11 @@ public class User implements UserDetails
 
     // for development:
     // constructor for Client's child
-    public User(UUID parentId, String firstName, String lastName, String username, String dob, String headshot) {
+    public User(UUID parentId, String firstName, String lastName, String phone, String username, String dob, String headshot) {
         this.parentId = parentId;
         this.firstName = firstName;
         this.lastName = lastName;
-        // this.phone = parent's phone?
+        this.phone = phone; //parent's phone
         this.username = username; //parent's username + "/firstName" + "/lastName"
         // this.password = null
         this.dob = LocalDate.parse(dob);

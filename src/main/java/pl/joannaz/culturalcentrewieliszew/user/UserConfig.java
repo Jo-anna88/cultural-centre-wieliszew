@@ -118,6 +118,7 @@ public class UserConfig {
                             userRepository.findByUsername("joanna.zzz@gmail.com").get().getId(),
                             "Iga",
                             "Zzz",
+                            userRepository.findByUsername("joanna.zzz@gmail.com").get().getPhone(),
                             "joanna.zzz@gmail.com/IgaZzz",
                             "2010-04-01",
                             "assets/images/avatar-girl.svg"
@@ -126,6 +127,7 @@ public class UserConfig {
                             userRepository.findByUsername("joanna.zzz@gmail.com").get().getId(),
                             "Maksymilian",
                             "Zzz",
+                            userRepository.findByUsername("joanna.zzz@gmail.com").get().getPhone(),
                             "joanna.zzz@gmail.com/MaksymilianZzz",
                             "2012-05-01",
                             "assets/images/avatar-boy.svg"
@@ -134,6 +136,7 @@ public class UserConfig {
                             userRepository.findByUsername("joanna.zzz@gmail.com").get().getId(),
                             "Piotr",
                             "Zzz",
+                            userRepository.findByUsername("joanna.zzz@gmail.com").get().getPhone(),
                             "joanna.zzz@gmail.com/PiotrZzz",
                             "2014-07-01",
                             "assets/images/avatar-boy.svg"
@@ -142,6 +145,7 @@ public class UserConfig {
                             userRepository.findByUsername("franek.aaa@gmail.com").get().getId(),
                             "Lukasz",
                             "Aaa",
+                            userRepository.findByUsername("joanna.zzz@gmail.com").get().getPhone(),
                             "franek.aaa@gmail.com/LukaszAaa",
                             "2000-03-15",
                             "assets/images/avatar-boy.svg"
@@ -150,6 +154,7 @@ public class UserConfig {
                             userRepository.findByUsername("franek.aaa@gmail.com").get().getId(),
                             "Zofia",
                             "Aaa",
+                            userRepository.findByUsername("joanna.zzz@gmail.com").get().getPhone(),
                             "franek.aaa@gmail.com/ZofiaAaa",
                             "2004-11-25",
                             "assets/images/avatar-girl.svg"
