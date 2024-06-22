@@ -47,8 +47,11 @@ public class Course {
     )
     private String name;
 
-    //private String teacher; // user_id that is a teacher (position)
-    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name="teacher_id"
+    )
+    @ManyToOne(
+            fetch = FetchType.LAZY)
     private User teacher;
 
     @Column(
@@ -58,6 +61,10 @@ public class Course {
     )
     private String description;
 
+    @Column(
+            name="category",
+            nullable = false
+    )
     @Enumerated(EnumType.STRING)
     private Category category;
 

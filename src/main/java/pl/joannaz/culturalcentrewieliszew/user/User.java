@@ -27,9 +27,7 @@ import static pl.joannaz.culturalcentrewieliszew.utils.constants.PASSWORD;
 import static pl.joannaz.culturalcentrewieliszew.utils.constants.SIMPLE_TEXT_SHORT;
 
 @Data // for setters and getters
-//@Builder // to use Builder design pattern
 @NoArgsConstructor
-//@AllArgsConstructor // needed for Builder
 @Table(
         name="users",
         uniqueConstraints = {
@@ -45,18 +43,68 @@ public class User implements UserDetails
     @Id
     @GeneratedValue(strategy= GenerationType.UUID)
     private UUID id;
+
+    @Column(
+            name="parent_id"
+    )
     private UUID parentId; // for relation with subaccounts
+
+    @Column(
+            name="first_name",
+            nullable = false
+    )
     private String firstName;
+
+    @Column(
+            name="last_name",
+            nullable = false
+    )
     private String lastName;
+
+    @Column(
+            name="phone"
+    )
     private String phone;
+
+    @Column(
+            name="username",
+            nullable = false
+    )
     private String username; // e.g. email, login
+
+    @Column(
+            name="password"
+    )
     private String password;
+
+    @Column(
+            name="dob",
+            nullable = false
+    )
     private LocalDate dob; // date-of-birth
+
+    @Column(
+            name="headshot",
+            nullable = false
+    )
     private String headshot; // headshot photo source (e.g. "assets/images/avatar1.svg")
+
+    @Column(
+            name="role",
+            nullable = false
+    )
     @Enumerated(EnumType.STRING)
     private Role role; // in this app user can have only one role
+
+    @Column(
+            name="position"
+    )
     private String position;
-    @Column(columnDefinition = "TEXT")
+
+    @Column(
+            name="description",
+            columnDefinition = "TEXT"
+    )
     private String description; // employee description
     // or:
     // @ManyToMany(fetch = FetchType.EAGER)

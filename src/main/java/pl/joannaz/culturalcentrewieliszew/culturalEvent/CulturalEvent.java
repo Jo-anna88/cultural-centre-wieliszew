@@ -9,6 +9,7 @@ import pl.joannaz.culturalcentrewieliszew.address.Address;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+@Table(name = "cultural_event")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,14 +18,41 @@ public class CulturalEvent {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(
+            name="img_source"
+    )
     private String imgSource;
+
+    @Column(
+            name="name",
+            nullable = false
+    )
     private String name;
+
+    @Column(
+            name="date",
+            nullable = false
+    )
     private LocalDate date;
-    @Column(columnDefinition = "TEXT")
+
+    @Column(
+            name="description",
+            nullable = false,
+            columnDefinition = "TEXT"
+    )
     private String description;
+
+    @Column(
+            name="price",
+            nullable = false
+    )
     private BigDecimal price;
+
     @ManyToOne(fetch = FetchType.LAZY)  // "By default, @ManyToOne associations use the FetchType.EAGER strategy, which can lead to N+1 query issues or fetching more data than necessary"
-    @JoinColumn(name = "address_id",
+    @JoinColumn(
+            name = "address_id",
+            nullable = false,
             foreignKey = @ForeignKey(name = "ADDRESS_ID_FK")
     )
     private Address address;

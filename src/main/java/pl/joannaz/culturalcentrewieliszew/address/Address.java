@@ -1,9 +1,6 @@
 package pl.joannaz.culturalcentrewieliszew.address;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,12 +17,41 @@ import lombok.NoArgsConstructor;
 public class Address {
     @Id
     private Integer id;
+
+    @Column(
+            name="location",
+            nullable = false
+    )
     private String location; // name of location (headquarters, branches)
+
+    @Column(
+            name="city",
+            nullable = false
+    )
     private String city;
+
+    @Column(
+            name="zip_code",
+            nullable = false
+    )
     private String zipCode;
+
+    @Column(
+            name="street",
+            nullable = false
+    )
     private String street;
+
+    @Column(
+            name="house_number",
+            nullable = false
+    )
     private String houseNumber;
-    private int flatNumber; // default value for declared field of type int: 0
+
+    @Column(
+            name="flat_number"
+    )
+    private Integer flatNumber; // default value for declared field of type int: 0
 
     public Address(String city, String zipCode, String street, String houseNumber) {
         this.city = city;

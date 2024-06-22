@@ -1,3 +1,4 @@
+/*
 package pl.joannaz.culturalcentrewieliszew.models;
 
 import jakarta.persistence.Entity;
@@ -16,3 +17,4 @@ public class ClassSchedule {
     private LocalTime startTime;
     private LocalTime endTime;
 }
+*/

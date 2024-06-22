@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import pl.joannaz.culturalcentrewieliszew.course.Course;
 import pl.joannaz.culturalcentrewieliszew.user.User;
+@Table(name = "user_course")
 @Getter
 @Setter
 @AllArgsConstructor
