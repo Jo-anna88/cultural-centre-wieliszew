@@ -57,7 +57,7 @@ public class UserService implements UserDetailsService {
                 parentUser.getFirstName(), parentUser.getLastName());
 
         // Set the parent ID
-        childUser.setParentId(parentUser.getId());
+        childUser.setParent(parentUser);
 
         // Set a contact phone as parent's phone
         childUser.setPhone(parentUser.getPhone());
@@ -68,13 +68,16 @@ public class UserService implements UserDetailsService {
         // Set a headshot
         childUser.setHeadshot(UserHelper.generateChildHeadshotValue(childUser.getFirstName()));
 
+        // Set a role
+        childUser.setRole(Role.CLIENT);
+
         // Save the child user
         return userRepository.save(childUser);
     }
 
     public User updateChild (User updatedChild) {
         logger.info("Updating child: {} {} of user with id {}.",
-                updatedChild.getFirstName(), updatedChild.getLastName(), updatedChild.getParentId());
+                updatedChild.getFirstName(), updatedChild.getLastName(), updatedChild.getParent().getId());
 
         logger.info("Fetching original user.");
         User originalChild = userRepository.findById(updatedChild.getId())

@@ -44,10 +44,10 @@ public class User implements UserDetails
     @GeneratedValue(strategy= GenerationType.UUID)
     private UUID id;
 
-    @Column(
-            name="parent_id"
-    )
-    private UUID parentId; // for relation with subaccounts
+    @ManyToOne
+    @JoinColumn(name = "parent_id")
+    private User parent; // for relation with subaccounts
+
 
     @Column(
             name="first_name",
@@ -162,8 +162,8 @@ public class User implements UserDetails
 
     // for development:
     // constructor for Client's child
-    public User(UUID parentId, String firstName, String lastName, String phone, String username, String dob, String headshot) {
-        this.parentId = parentId;
+    public User(User parent, String firstName, String lastName, String phone, String username, String dob, String headshot) {
+        this.parent = parent;
         this.firstName = firstName;
         this.lastName = lastName;
         this.phone = phone; //parent's phone

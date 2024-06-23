@@ -27,6 +27,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     UserBasicInfo findUserBasicInfo(@Param("uuid") UUID uuid);
 
     @Query("SELECT new pl.joannaz.culturalcentrewieliszew.user.UserBasicInfo(child.id, child.firstName, child.lastName) " +
-            "FROM User child WHERE (child.parentId = :parentId)")
+            "FROM User child WHERE (child.parent.id = :parentId)")
     List<UserBasicInfo> findChildrenBasicInfo(@Param("parentId") UUID parentId);
 }

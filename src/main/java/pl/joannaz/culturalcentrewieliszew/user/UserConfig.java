@@ -115,7 +115,7 @@ public class UserConfig {
         return args -> userRepository.saveAll(
                 List.of(
                     new User( // child1.1
-                            userRepository.findByUsername("joanna.zzz@gmail.com").get().getId(),
+                            userRepository.findByUsername("joanna.zzz@gmail.com").get(),
                             "Iga",
                             "Zzz",
                             userRepository.findByUsername("joanna.zzz@gmail.com").get().getPhone(),
@@ -124,7 +124,7 @@ public class UserConfig {
                             "assets/images/avatar-girl.svg"
                     ),
                     new User( // child1.2
-                            userRepository.findByUsername("joanna.zzz@gmail.com").get().getId(),
+                            userRepository.findByUsername("joanna.zzz@gmail.com").get(),
                             "Maksymilian",
                             "Zzz",
                             userRepository.findByUsername("joanna.zzz@gmail.com").get().getPhone(),
@@ -133,7 +133,7 @@ public class UserConfig {
                             "assets/images/avatar-boy.svg"
                     ),
                     new User( // child1.3
-                            userRepository.findByUsername("joanna.zzz@gmail.com").get().getId(),
+                            userRepository.findByUsername("joanna.zzz@gmail.com").get(),
                             "Piotr",
                             "Zzz",
                             userRepository.findByUsername("joanna.zzz@gmail.com").get().getPhone(),
@@ -142,7 +142,7 @@ public class UserConfig {
                             "assets/images/avatar-boy.svg"
                     ),
                     new User( // child2.1
-                            userRepository.findByUsername("franek.aaa@gmail.com").get().getId(),
+                            userRepository.findByUsername("franek.aaa@gmail.com").get(),
                             "Lukasz",
                             "Aaa",
                             userRepository.findByUsername("joanna.zzz@gmail.com").get().getPhone(),
@@ -151,7 +151,7 @@ public class UserConfig {
                             "assets/images/avatar-boy.svg"
                     ),
                     new User( // child2.2
-                            userRepository.findByUsername("franek.aaa@gmail.com").get().getId(),
+                            userRepository.findByUsername("franek.aaa@gmail.com").get(),
                             "Zofia",
                             "Aaa",
                             userRepository.findByUsername("joanna.zzz@gmail.com").get().getPhone(),
