@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import pl.joannaz.culturalcentrewieliszew.linkEntities.UserCourse;
+import pl.joannaz.culturalcentrewieliszew.courseregistration.CourseRegistration;
 import pl.joannaz.culturalcentrewieliszew.user.User;
 
 import java.util.ArrayList;
@@ -82,7 +82,7 @@ public class Course {
     )
     //@JsonIgnoreProperties("course")
     @JsonManagedReference(value="course-user")
-    private List<UserCourse> participants = new ArrayList<>(maxParticipantsNumber);
+    private List<CourseRegistration> participants = new ArrayList<>(maxParticipantsNumber);
 
     public Course(String imgSource, String name, String description, int maxParticipantsNumber) {
         this.imgSource = imgSource;

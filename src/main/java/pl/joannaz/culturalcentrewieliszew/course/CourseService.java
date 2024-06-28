@@ -1,6 +1,7 @@
 package pl.joannaz.culturalcentrewieliszew.course;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,33 +10,26 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.joannaz.culturalcentrewieliszew.address.Address;
 import pl.joannaz.culturalcentrewieliszew.address.AddressRepository;
-import pl.joannaz.culturalcentrewieliszew.linkEntities.UserCourse;
+import pl.joannaz.culturalcentrewieliszew.address.AddressService;
+import pl.joannaz.culturalcentrewieliszew.courseregistration.CourseRegistration;
 import pl.joannaz.culturalcentrewieliszew.user.User;
 import pl.joannaz.culturalcentrewieliszew.user.UserRepository;
+import pl.joannaz.culturalcentrewieliszew.user.UserService;
 
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class CourseService {
 
     private final CourseRepository courseRepository;
     private final CourseDetailsRepository detailsRepository;
-    private final UserRepository userRepository;
-    private final AddressRepository addressRepository;
+    private final UserService userService;
+    private final AddressService addressService;
     private static final Logger logger = LoggerFactory.getLogger(CourseService.class);
-
-    public CourseService (CourseRepository courseRepository,
-                          CourseDetailsRepository detailsRepository,
-                          UserRepository userRepository,
-                          AddressRepository addressRepository) {
-        this.courseRepository = courseRepository;
-        this.detailsRepository = detailsRepository;
-        this.userRepository = userRepository;
-        this.addressRepository = addressRepository;
-    }
 
     public List<CourseDTO> getAllCourses() {
         logger.info("Fetching all courses.");
@@ -71,7 +65,7 @@ public class CourseService {
                     courseDTO.getTeacher().getFirstName(),
                     courseDTO.getTeacher().getLastName(),
                     courseDTO.getName());
-            newCourse.setTeacher(getTeacherById(courseDTO.getTeacher().getId()));
+            newCourse.setTeacher(userService.getUser(courseDTO.getTeacher().getId()));
         }
         try {
             return new CourseDTO(courseRepository.save(newCourse));
@@ -79,15 +73,6 @@ public class CourseService {
             logger.error(e.getMessage());
             throw new DataIntegrityViolationException("Course with such a name already exists.");
         }
-    }
-
-    public User getTeacherById(UUID teacherId) {
-        logger.info("Fetching teacher with id {}.", teacherId);
-        return userRepository.findById(teacherId)
-                .orElseThrow(() -> {
-                    logger.error("Error during fetching course details with id {}", teacherId);
-                    return new EntityNotFoundException(String.format("Teacher with id %s not found.", teacherId));
-                });
     }
 
     public CourseDTO updateCourse(CourseDTO updatedCourseDTO) {
@@ -112,7 +97,7 @@ public class CourseService {
 
         originalCourse.setDescription(updatedCourseDTO.getDescription());
         originalCourse.setImgSource(updatedCourseDTO.getImgSource());
-        originalCourse.setTeacher(getTeacherById(updatedCourseDTO.getTeacher().getId()));
+        originalCourse.setTeacher(userService.getUser(updatedCourseDTO.getTeacher().getId()));
         originalCourse.setCategory(updatedCourseDTO.getCategory());
         originalCourse.setMaxParticipantsNumber(updatedCourseDTO.getMaxParticipantsNumber());
 
@@ -153,20 +138,11 @@ public class CourseService {
                     );
                 });
         CourseDetails courseDetails = new CourseDetails(courseDetailsDTO);
-        courseDetails.setAddress(getAddressById(courseDetailsDTO.getLocation().getId()));
+        courseDetails.setAddress(addressService.getAddressById(courseDetailsDTO.getLocation().getId()));
         courseDetails.setCourse(course);
 
         logger.info("Saving course details");
         return new CourseDetailsDTO(detailsRepository.save(courseDetails));
-    }
-
-    public Address getAddressById(Integer addressId) {
-        logger.info("Fetching address with id: {}", addressId);
-        return addressRepository.findById(addressId)
-                .orElseThrow(() -> {
-                    logger.error("Error during fetching address with id: {}", addressId);
-                    return new EntityNotFoundException(String.format("Location with id %s not found.", addressId));
-                });
     }
 
     public CourseDetailsDTO updateCourseDetails(CourseDetailsDTO updatedCourseDetailsDTO) {
@@ -182,7 +158,7 @@ public class CourseService {
         originalCourseDetails.update(updatedCourseDetailsDTO);
         if (!Objects.equals(originalCourseDetails.getAddress().getId(), updatedCourseDetailsDTO.getLocation().getId())) {
             logger.info("Updating course details address.");
-            originalCourseDetails.setAddress(getAddressById(updatedCourseDetailsDTO.getLocation().getId()));
+            originalCourseDetails.setAddress(addressService.getAddressById(updatedCourseDetailsDTO.getLocation().getId()));
         }
 
         logger.info("Saving updated course details.");
@@ -208,9 +184,9 @@ public class CourseService {
         if (optionalCourse.isPresent()) {
             Course course = optionalCourse.get();
             logger.info("Fetching participants of {} course.", course.getName());
-            List<UserCourse> userCourses = course.getParticipants();
-            return userCourses.stream()
-                    .map(UserCourse::getParticipant)
+            List<CourseRegistration> coursRegistrations = course.getParticipants();
+            return coursRegistrations.stream()
+                    .map(CourseRegistration::getParticipant)
                     .map(user -> user.getFirstName() + " " + user.getLastName()) // Map User to UserDTO using constructor reference
                     .collect(Collectors.toList());
         } else {

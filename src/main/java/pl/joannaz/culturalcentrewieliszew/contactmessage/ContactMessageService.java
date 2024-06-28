@@ -1,4 +1,4 @@
-package pl.joannaz.culturalcentrewieliszew.contactMessage;
+package pl.joannaz.culturalcentrewieliszew.contactmessage;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;

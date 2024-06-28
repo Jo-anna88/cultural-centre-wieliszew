@@ -1,4 +1,4 @@
-package pl.joannaz.culturalcentrewieliszew.contactMessage;
+package pl.joannaz.culturalcentrewieliszew.contactmessage;
 
 import lombok.Data;
 

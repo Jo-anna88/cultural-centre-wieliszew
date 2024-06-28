@@ -11,7 +11,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.joannaz.culturalcentrewieliszew.course.*;
-import pl.joannaz.culturalcentrewieliszew.linkEntities.UserCourse;
+import pl.joannaz.culturalcentrewieliszew.courseregistration.CourseRegistration;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -117,7 +117,7 @@ public class UserService implements UserDetailsService {
                 });
     }
 
-    public void deleteChild (UUID childId) { // corresponding rows in UserCourse are deleted automatically (removing child from lists of participants)
+    public void deleteChild (UUID childId) { // corresponding rows in CourseRegistration are deleted automatically (removing child from lists of participants)
         logger.info("Checking whether child with id: {} exists.", childId);
         boolean childExists = userRepository.existsById(childId);
         if (!childExists) {
@@ -138,7 +138,7 @@ public class UserService implements UserDetailsService {
         User user = this.getUser(userId);
         logger.info("Fetching courses for user with id: {}", userId);
         return user.getCourses().stream()
-                .map(UserCourse::getCourse)
+                .map(CourseRegistration::getCourse)
                 .map(CourseBasicInfo::new)
                 .toList();
     }
@@ -167,7 +167,7 @@ public class UserService implements UserDetailsService {
         });
 
         // check if there is free slot for new participant
-        logger.info("Checking whether there are free slots for {} course.", course.getName());
+        logger.info("Checking free slots for {} course.", course.getName());
         if (course.getParticipants().size() < course.getMaxParticipantsNumber()) {
             // check if user age match minAge and maxAge values
             logger.info("Validating age");
@@ -304,7 +304,7 @@ public class UserService implements UserDetailsService {
         logger.info("Removing children for user with id: {}.", currentUser.getId());
         children.forEach(child -> this.deleteChild(child.getId()));
 
-        // remove user account (corresponding rows in UserCourse should be deleted automatically)
+        // remove user account (corresponding rows in CourseRegistration should be deleted automatically)
         logger.info("Removing account of client with id: {}.", currentUser.getId());
         this.userRepository.deleteById(currentUser.getId());
     }

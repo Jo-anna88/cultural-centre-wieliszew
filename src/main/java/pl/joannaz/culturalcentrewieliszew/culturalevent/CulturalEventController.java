@@ -1,9 +1,7 @@
-package pl.joannaz.culturalcentrewieliszew.culturalEvent;
+package pl.joannaz.culturalcentrewieliszew.culturalevent;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,5 +40,10 @@ public class CulturalEventController {
     @DeleteMapping("/{id}")
     public Long deleteCulturalEvent(@PathVariable("id") Long id) {
         return culturalEventService.deleteCulturalEvent(id);
+    }
+
+    @GetMapping("/{id}/free-slots")
+    public Integer getFreeSlotsById(@PathVariable("id") Long culturalEventId) {
+        return culturalEventService.getFreeSlots(culturalEventId);
     }
 }

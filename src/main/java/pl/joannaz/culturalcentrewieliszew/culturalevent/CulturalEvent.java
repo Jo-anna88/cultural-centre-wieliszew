@@ -1,13 +1,17 @@
-package pl.joannaz.culturalcentrewieliszew.culturalEvent;
+package pl.joannaz.culturalcentrewieliszew.culturalevent;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import pl.joannaz.culturalcentrewieliszew.address.Address;
+import pl.joannaz.culturalcentrewieliszew.culturaleventbooking.CulturalEventBooking;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name = "cultural_event")
 @Data
@@ -58,6 +62,21 @@ public class CulturalEvent {
     )
     private Address address;
 
+    @Column(
+            name="max_participants_number",
+            nullable = false
+    )
+    private int maxParticipantsNumber; // maksymalna liczba uczestników
+
+    /*
+    @OneToMany(
+            mappedBy = "cultural_event", //?
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JsonManagedReference(value="event-user")
+    private List<CulturalEventBooking> participants = new ArrayList<>(maxParticipantsNumber);
+    */
     public CulturalEvent(CulturalEventDTO culturalEventDTO) {
         this.imgSource = culturalEventDTO.getImgSource();
         this.name = culturalEventDTO.getName();
@@ -67,12 +86,13 @@ public class CulturalEvent {
         // address set with usage of setter
     }
 
-    public CulturalEvent(String imgSource, String name, String date, String description, BigDecimal price, Address address) {
+    public CulturalEvent(String imgSource, String name, String date, String description, BigDecimal price, Address address, int maxParticipantsNumber) {
         this.imgSource = imgSource;
         this.name = name;
         this.date = LocalDate.parse(date);
         this.description = description;
         this.price = price;
         this.address = address;
+        this.maxParticipantsNumber = maxParticipantsNumber;
     }
 }

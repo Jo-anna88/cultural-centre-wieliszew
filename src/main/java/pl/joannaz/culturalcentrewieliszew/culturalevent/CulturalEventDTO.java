@@ -1,4 +1,4 @@
-package pl.joannaz.culturalcentrewieliszew.culturalEvent;
+package pl.joannaz.culturalcentrewieliszew.culturalevent;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,6 +17,7 @@ public class CulturalEventDTO {
     private String description;
     private BigDecimal price;
     private Location location;
+    private int maxParticipantsNumber;
 
     public CulturalEventDTO (CulturalEvent culturalEvent) {
         this.id = culturalEvent.getId();
@@ -29,5 +30,6 @@ public class CulturalEventDTO {
                 culturalEvent.getAddress().getId(),
                 culturalEvent.getAddress().getLocation()
         );
+        this.maxParticipantsNumber = culturalEvent.getMaxParticipantsNumber();
     }
 }

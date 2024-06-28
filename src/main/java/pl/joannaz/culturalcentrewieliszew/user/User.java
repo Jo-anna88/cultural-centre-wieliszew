@@ -1,30 +1,20 @@
 package pl.joannaz.culturalcentrewieliszew.user;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.transaction.annotation.Transactional;
 import pl.joannaz.culturalcentrewieliszew.course.Course;
-//import pl.joannaz.culturalcentrewieliszew.course.CourseDetails;
-//import pl.joannaz.culturalcentrewieliszew.culturalEvent.CulturalEvent;
-import pl.joannaz.culturalcentrewieliszew.linkEntities.UserCourse;
-import pl.joannaz.culturalcentrewieliszew.utils.Utility;
-//import pl.joannaz.culturalcentrewieliszew.linkEntities.UserCulturalEvent;
-//import org.springframework.security.core.GrantedAuthority;
-//import org.springframework.security.core.authority.SimpleGrantedAuthority;
-//import org.springframework.security.core.userdetails.UserDetails;
+import pl.joannaz.culturalcentrewieliszew.courseregistration.CourseRegistration;
+import pl.joannaz.culturalcentrewieliszew.culturalevent.CulturalEvent;
+import pl.joannaz.culturalcentrewieliszew.culturaleventbooking.CulturalEventBooking;
 
 import java.time.LocalDate;
 import java.util.*;
 
 import static pl.joannaz.culturalcentrewieliszew.utils.constants.PASSWORD;
-import static pl.joannaz.culturalcentrewieliszew.utils.constants.SIMPLE_TEXT_SHORT;
 
 @Data // for setters and getters
 @NoArgsConstructor
@@ -131,19 +121,18 @@ public class User implements UserDetails
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    //@JsonIgnoreProperties("participant")
     @JsonManagedReference(value="user-course")
-    private List<UserCourse> courses = new ArrayList<>(); // for CLIENT
+    private List<CourseRegistration> courses = new ArrayList<>(); // for CLIENT
 
-    //@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    //private Set<CulturalEvent> culturalEvents = new HashSet<>();
-//    @OneToMany(
-//            mappedBy = "participant",
-//            cascade = CascadeType.ALL,
-//            orphanRemoval = true,
-//            fetch = FetchType.EAGER
-//    )
-//    private List<UserCulturalEvent> culturalEvents = new ArrayList<>();
+    /*
+    @OneToMany(
+            mappedBy = "participant",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JsonManagedReference(value="user-event")
+    private List<CulturalEventBooking> culturalEvents = new ArrayList<>(); // for CLIENT
+     */
 
     // for development:
     // constructor for Client
@@ -235,32 +224,33 @@ public class User implements UserDetails
 
     // helper/utility methods for @OneToMany associations
     public void addCourse(Course course) {
-        UserCourse userCourse = new UserCourse(this, course);
-        courses.add(userCourse);
-        course.getParticipants().add(userCourse);
+        CourseRegistration courseRegistration = new CourseRegistration(this, course);
+        courses.add(courseRegistration);
+        course.getParticipants().add(courseRegistration);
     }
 
     public void removeCourse(Course course) {
-        List<UserCourse> ucList = course.getParticipants();
-        UserCourse record = ucList.stream().filter(uc -> uc.getParticipant().getId().equals(this.id)).findFirst().get();
+        List<CourseRegistration> ucList = course.getParticipants();
+        CourseRegistration record = ucList.stream().filter(uc -> uc.getParticipant().getId().equals(this.id)).findFirst().get();
         course.getParticipants().remove(record);
         courses.remove(record);
         record.setParticipant(null);
         record.setCourse(null);
     }
-
+//
 //    public void addCulturalEvent(CulturalEvent culturalEvent) {
-//        UserCulturalEvent userCulturalEvent = new UserCulturalEvent(this, culturalEvent);
-//        culturalEvents.add(userCulturalEvent);
-//        culturalEvent.getParticipants().add(userCulturalEvent);
+//        CulturalEventBooking culturalEventBooking = new CulturalEventBooking(this, culturalEvent);
+//        culturalEvents.add(culturalEventBooking);
+//        culturalEvent.getParticipants().add(culturalEventBooking);
 //    }
 //
 //    public void removeCulturalEvent(CulturalEvent culturalEvent) {
-//        UserCulturalEvent userCulturalEvent = new UserCulturalEvent(this, culturalEvent);
-//        culturalEvent.getParticipants().remove(userCulturalEvent);
-//        culturalEvents.remove(userCulturalEvent);
-//        userCulturalEvent.setParticipant(null);
-//        userCulturalEvent.setCulturalEvent(null);
+//        List<CulturalEventBooking> uceList = culturalEvent.getParticipants();
+//        CulturalEventBooking record = uceList.stream().filter(uce -> uce.getParticipant().getId().equals(this.id)).findFirst().get();
+//        culturalEvent.getParticipants().remove(record);
+//        culturalEvents.remove(record);
+//        record.setParticipant(null);
+//        record.setCulturalEvent(null);
 //    }
 
     /*
