@@ -15,11 +15,11 @@ public class CulturalEventController {
 
     @GetMapping
     public ResponseEntity<List<CulturalEventDTO>> getAllCulturalEvents(HttpServletResponse response) throws InterruptedException {
-        //Thread.sleep(3000); // to check dealing with slow REST responses
-        //List<CulturalEventDTO> culturalEvents = culturalEventService.getAllCulturalEvents();
-        //return ResponseEntity.ok(culturalEvents);
-        response.setStatus(500);
-        return null;
+//        Thread.sleep(3000); // to check dealing with slow REST responses
+        List<CulturalEventDTO> culturalEvents = culturalEventService.getAllCulturalEvents();
+        return ResponseEntity.ok(culturalEvents);
+//        response.setStatus(500);
+//        return null;
     }
 
     @GetMapping("/{id}")

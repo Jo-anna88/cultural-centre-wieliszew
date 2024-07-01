@@ -63,6 +63,7 @@ public class RestSecurityConfig { // import org.springframework.security.config.
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/classes/**").permitAll()
                         .requestMatchers("/api/events/**").permitAll()
+                        .requestMatchers("/api/booking/**").permitAll()
                         .requestMatchers("/api/user/**").permitAll() // just for testing
                         .requestMatchers(HttpMethod.GET,"/api/address/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/contact").permitAll()

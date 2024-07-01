@@ -94,7 +94,7 @@ public class AuthController {
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(new MessageResponse("You've been signed out!"));
          */
-        SecurityContextHolder.getContext().setAuthentication(null); // z Udemy, brak na bezkoder
+        SecurityContextHolder.getContext().setAuthentication(null); // from Udemy
     }
 
     @GetMapping("/role")
