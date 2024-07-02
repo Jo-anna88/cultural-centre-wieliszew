@@ -71,10 +71,10 @@ public class CulturalEventServiceTests {
     @DisplayName("getCulturalEventById should throw EntityNotFoundException against CulturalEventDTO if Cultural Event is not found")
     void testGetCulturalEventByIdNotFound() {
         when(culturalEventRepository.findById(1L)).thenReturn(Optional.empty());
+
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> culturalEventService.getCulturalEventById(1L));
 
         assertEquals("Cultural Event with id 1 not found.", exception.getMessage());
-
         verify(culturalEventRepository, times(1)).findById(1L);
     }
 
@@ -93,10 +93,10 @@ public class CulturalEventServiceTests {
     @DisplayName("getCulturalEvent should throw EntityNotFoundException against CulturalEvent if Cultural Event is not found.")
     void testGetCulturalEventNotFound() {
         when(culturalEventRepository.findById(1L)).thenReturn(Optional.empty());
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> culturalEventService.getCulturalEventById(1L));
+
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> culturalEventService.getCulturalEvent(1L));
 
         assertEquals("Cultural Event with id 1 not found.", exception.getMessage());
-
         verify(culturalEventRepository, times(1)).findById(1L);
     }
 
