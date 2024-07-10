@@ -67,10 +67,10 @@ public class CourseController {
         return courseService.deleteCourseDetails(id);
     }
 
-    @GetMapping("/{id}/participants")
-    public List<String> getParticipantsByCourseId(@PathVariable("id") Long id) {
-        return courseService.getParticipantsByCourseId(id);
-    }
+//    @GetMapping("/{id}/participants")
+//    public List<String> getParticipantsByCourseId(@PathVariable("id") Long id) {
+//        return courseService.getParticipantsByCourseId(id);
+//    }
 
     @GetMapping("/search")
     public List<CourseDTO> searchCourses(HttpServletResponse response,

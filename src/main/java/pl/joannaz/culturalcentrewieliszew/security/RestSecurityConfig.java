@@ -59,18 +59,31 @@ public class RestSecurityConfig { // import org.springframework.security.config.
                 .csrf(AbstractHttpConfigurer::disable) // against method reference we could use lambda: (csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // we want to re-authenticate the user on every request
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/classes/**").permitAll()
-                        .requestMatchers("/api/events/**").permitAll()
-                        .requestMatchers("/api/booking/**").permitAll()
-                        .requestMatchers("/api/user/**").permitAll() // just for testing
-                        .requestMatchers(HttpMethod.GET,"/api/address/**").permitAll()
-                        .requestMatchers("/api/contact").permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/api/test/client").hasRole("CLIENT")
-//                        .requestMatchers(HttpMethod.GET, "/api/test/employee").hasRole("EMPLOYEE")
-//                        .requestMatchers(HttpMethod.GET, "/api/test/admin").hasRole("ADMIN")
-                        .anyRequest().authenticated()
+                        .requestMatchers(HttpMethod.OPTIONS).permitAll() // for pre-flight requests
+
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll() // for development
+
+                        .requestMatchers(HttpMethod.DELETE,"/api/events/**").hasAnyRole("EMPLOYEE", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/events/**").hasAnyRole("EMPLOYEE", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/events/**").hasAnyRole("EMPLOYEE", "ADMIN")
+
+                        .requestMatchers("/api/booking/**").hasRole("CLIENT")
+
+                        .requestMatchers(HttpMethod.DELETE,"/api/classes/**").hasAnyRole("EMPLOYEE", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/classes/**").hasAnyRole("EMPLOYEE", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/classes/**").hasAnyRole("EMPLOYEE", "ADMIN")
+
+                        .requestMatchers(HttpMethod.GET,"/api/user/employee").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/user/employee/{id}/profile").permitAll()
+                        .requestMatchers("/api/user/employee/**").hasRole("ADMIN") // only ADMIN can add, update and delete employee
+                        .requestMatchers("/api/user/profile").hasAnyRole("CLIENT", "EMPLOYEE", "ADMIN")
+                        .requestMatchers("/api/user/teachers").permitAll()
+                        .requestMatchers("/api/user/**").hasRole("CLIENT")
+
+                        .requestMatchers("/api/auth/**", "/api/address/**", "/api/contact",
+                                "/api/events/**", "/api/classes/**").permitAll() // permitAll - requires no authorization
+                                // and is a public endpoint; the Authentication is never retrieved from the session
+                        .anyRequest().authenticated() // require authentication for ALL other requests
                 );
 //                .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
 //        ;

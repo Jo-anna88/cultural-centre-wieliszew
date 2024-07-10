@@ -32,7 +32,7 @@ public class UserController {
         return new UserDTO(this.userService.updateClient(updatedClient));
     }
 
-    @DeleteMapping()
+    @DeleteMapping() // for account removal
     public void deleteClient(HttpServletResponse response) {
         this.userService.deleteClientAccount();
         response.addCookie(jwtService.cleanJwtCookie(jwtCookieName));
@@ -69,7 +69,7 @@ public class UserController {
     }
 
     // User's children endpoints:
-    @GetMapping("/children-simple")
+    @GetMapping("/child-simple")
     public List<UserBasicInfo> getChildrenSimpleData(){
         logger.info("Fetching logged in user and his/her children's simple data.");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -82,7 +82,7 @@ public class UserController {
         }
     }
 
-    @GetMapping("/children")
+    @GetMapping("/child")
     public List<UserDTO> getChildrenByParentId() {
         logger.info("Fetching logged in user and his/her children.");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -157,6 +157,7 @@ public class UserController {
         userService.removeCourse(courseId, userId);
     }
 
+
     // Teacher endpoint:
 
     @GetMapping("/teachers")
@@ -166,7 +167,7 @@ public class UserController {
 
     // Employee endpoints:
 
-    @GetMapping("/employees")
+    @GetMapping("/employee")
     public List<EmployeeProfile> getEmployees() {
         return userService.findEmployees();
     }

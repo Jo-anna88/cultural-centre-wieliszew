@@ -178,22 +178,22 @@ public class CourseService {
         return id;
     }
 
-    public List<String> getParticipantsByCourseId(Long id) {
-        logger.info("Fetching course with id: {}", id);
-        Optional<Course> optionalCourse = courseRepository.findById(id);
-        if (optionalCourse.isPresent()) {
-            Course course = optionalCourse.get();
-            logger.info("Fetching participants of {} course.", course.getName());
-            List<CourseRegistration> coursRegistrations = course.getParticipants();
-            return coursRegistrations.stream()
-                    .map(CourseRegistration::getParticipant)
-                    .map(user -> user.getFirstName() + " " + user.getLastName()) // Map User to UserDTO using constructor reference
-                    .collect(Collectors.toList());
-        } else {
-            logger.error("Error during fetching course with id: {}", id);
-            throw new EntityNotFoundException(String.format("Course with id %s not found.", id));
-        }
-    }
+//    public List<String> getParticipantsByCourseId(Long id) {
+//        logger.info("Fetching course with id: {}", id);
+//        Optional<Course> optionalCourse = courseRepository.findById(id);
+//        if (optionalCourse.isPresent()) {
+//            Course course = optionalCourse.get();
+//            logger.info("Fetching participants of {} course.", course.getName());
+//            List<CourseRegistration> courseRegistrations = course.getParticipants();
+//            return courseRegistrations.stream()
+//                    .map(CourseRegistration::getParticipant)
+//                    .map(user -> user.getFirstName() + " " + user.getLastName()) // Map User to UserDTO using constructor reference
+//                    .collect(Collectors.toList());
+//        } else {
+//            logger.error("Error during fetching course with id: {}", id);
+//            throw new EntityNotFoundException(String.format("Course with id %s not found.", id));
+//        }
+//    }
 
     public List<CourseDTO> findCoursesByCriteria(
             Integer minAge, Integer maxAge, BigDecimal price, UUID teacher, Category category, String name, Integer location) {
