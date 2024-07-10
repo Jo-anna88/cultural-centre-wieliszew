@@ -57,33 +57,48 @@ public class RestSecurityConfig { // import org.springframework.security.config.
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable) // against method reference we could use lambda: (csrf -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // we want to re-authenticate the user on every request
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // to re-authenticate the user on every request
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS).permitAll() // for pre-flight requests
+                        // for pre-flight requests
+                        // permitAll() - requires no authorization and is a public endpoint;
+                        // the Authentication is never retrieved from the session
+                        .requestMatchers(HttpMethod.OPTIONS).permitAll()
 
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll() // for development
+                        // for development
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
 
+                        // require EMPLOYEE or ADMIN role for create, update and delete cultural events
                         .requestMatchers(HttpMethod.DELETE,"/api/events/**").hasAnyRole("EMPLOYEE", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/events/**").hasAnyRole("EMPLOYEE", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/events/**").hasAnyRole("EMPLOYEE", "ADMIN")
 
+                        // require CLIENT role for booking operations
                         .requestMatchers("/api/booking/**").hasRole("CLIENT")
 
+                        // require EMPLOYEE or ADMIN role for create, update and delete classes (courses)
                         .requestMatchers(HttpMethod.DELETE,"/api/classes/**").hasAnyRole("EMPLOYEE", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/classes/**").hasAnyRole("EMPLOYEE", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/classes/**").hasAnyRole("EMPLOYEE", "ADMIN")
 
                         .requestMatchers(HttpMethod.GET,"/api/user/employee").permitAll()
                         .requestMatchers(HttpMethod.GET,"/api/user/employee/{id}/profile").permitAll()
-                        .requestMatchers("/api/user/employee/**").hasRole("ADMIN") // only ADMIN can add, update and delete employee
+
+                        // require ADMIN role for create, update and delete employees
+                        .requestMatchers("/api/user/employee/**").hasRole("ADMIN")
+
+                        // require authenticated user for getting profile
                         .requestMatchers("/api/user/profile").hasAnyRole("CLIENT", "EMPLOYEE", "ADMIN")
+
                         .requestMatchers("/api/user/teachers").permitAll()
+
+                        // require CLIENT role for any other /user/** endpoints
                         .requestMatchers("/api/user/**").hasRole("CLIENT")
 
                         .requestMatchers("/api/auth/**", "/api/address/**", "/api/contact",
-                                "/api/events/**", "/api/classes/**").permitAll() // permitAll - requires no authorization
-                                // and is a public endpoint; the Authentication is never retrieved from the session
-                        .anyRequest().authenticated() // require authentication for ALL other requests
+                                "/api/events/**", "/api/classes/**").permitAll()
+
+                        // require authentication for ALL other requests
+                        .anyRequest().authenticated()
                 );
 //                .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
 //        ;
