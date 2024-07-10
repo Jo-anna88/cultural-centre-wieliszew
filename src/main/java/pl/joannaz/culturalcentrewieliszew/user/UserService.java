@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.joannaz.culturalcentrewieliszew.course.*;
 import pl.joannaz.culturalcentrewieliszew.courseregistration.CourseRegistration;
+import pl.joannaz.culturalcentrewieliszew.culturaleventbooking.BookingRepository;
+import pl.joannaz.culturalcentrewieliszew.culturaleventbooking.CulturalEventBooking;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -23,7 +25,18 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
     private final CourseDetailsRepository courseDetailsRepository;
+    private final BookingRepository bookingRepository;
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        logger.info("Fetching user with username: {}.", username);
+        return this.userRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    logger.error("User with {} not found.", username);
+                    return new UsernameNotFoundException(String.format("User with %s not found.", username));
+                });
+    }
 
     public void addUser(User user) {
         logger.info("Adding user {} {} to the database.", user.getFirstName(), user.getLastName());
@@ -35,16 +48,6 @@ public class UserService implements UserDetailsService {
     public boolean existsByUsername(String username) {
         logger.info("Checking if user with username: {} exists.", username);
         return this.userRepository.existsByUsername(username);
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        logger.info("Fetching user with username: {}.", username);
-        return this.userRepository.findByUsername(username)
-                .orElseThrow(() -> {
-                    logger.error("User with {} not found.", username);
-                    return new UsernameNotFoundException(String.format("User with %s not found.", username));
-                });
     }
 
     public List<User> getChildren(UUID parentId) {
@@ -303,6 +306,10 @@ public class UserService implements UserDetailsService {
         List<User> children = this.getChildren(currentUser.getId());
         logger.info("Removing children for user with id: {}.", currentUser.getId());
         children.forEach(child -> this.deleteChild(child.getId()));
+
+        // check if user has bookings and remove them
+        List<CulturalEventBooking> bookings = bookingRepository.findAllByParticipantId(currentUser.getId());
+        bookings.forEach(booking -> bookingRepository.deleteById(booking.getId()));
 
         // remove user account (corresponding rows in CourseRegistration should be deleted automatically)
         logger.info("Removing account of client with id: {}.", currentUser.getId());

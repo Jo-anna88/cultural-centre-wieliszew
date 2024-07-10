@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -59,16 +60,24 @@ public class GlobalExceptionHandler {
                 .body(e.getMessage());
     }
 
+//    @ExceptionHandler({HttpRequestMethodNotSupportedException.class})
+//    public ResponseEntity<String> handleMethodNotSupportedExceptions(HttpRequestMethodNotSupportedException e) {
+//        logger.error("Http Request Method Not Supported Exception: {}", e.getMessage());
+//        return ResponseEntity
+//                .status(HttpStatus.METHOD_NOT_ALLOWED)
+//                .body(e.getMessage());
+//    }
+
     @ExceptionHandler({RuntimeException.class})
-    public ResponseEntity<Object> handleRuntimeException(RuntimeException e) {
+    public ResponseEntity<String> handleRuntimeException(RuntimeException e) {
         logger.error("Runtime Exception: {}", e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(e.getMessage());
     }
 
-    @ExceptionHandler({Exception.class})
-    public void handleOtherExceptions(Exception e) {
-        logger.error("Other Exception: {}", e.getStackTrace());
-    }
+//    @ExceptionHandler({Exception.class})
+//    public void handleOtherExceptions(Exception e) {
+//        logger.error("Other Exception: {}", e.getStackTrace());
+//    }
 }

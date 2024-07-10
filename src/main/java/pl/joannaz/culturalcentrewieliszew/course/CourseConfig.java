@@ -3,13 +3,9 @@ package pl.joannaz.culturalcentrewieliszew.course;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import pl.joannaz.culturalcentrewieliszew.user.UserRepository;
 
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
 
 import static pl.joannaz.culturalcentrewieliszew.utils.constants.SIMPLE_TEXT;
 
@@ -18,11 +14,9 @@ public class CourseConfig {
 
     @Bean
     CommandLineRunner courseRunner (CourseRepository courseRepository,
-                                    CourseService courseService,
-                                    CourseDetailsRepository detailsRepository,
                                     UserRepository userRepository) {
 		return args -> {
-            Thread.sleep(3000);
+            Thread.sleep(1000);
             Course course1 = new Course("assets/icons/ballet-shoes.png", "Ballet",
                     userRepository.findByUsername("anna.baletowicz@ccw.pl").get(),
                     SIMPLE_TEXT, 10, Category.DANCE);
@@ -49,10 +43,6 @@ public class CourseConfig {
                             SIMPLE_TEXT, 10, Category.EDUCATION)
                 )
             );
-//            CourseDetails courseDetails1 = new CourseDetails(5, 8, BigDecimal.valueOf(150.00),
-//                    45, "Mon 14:00 - 14:45", courseService.getAddressById(1));
-//            courseDetails1.setCourse(course1);
-//            detailsRepository.save(courseDetails1);
 		};
 	}
 

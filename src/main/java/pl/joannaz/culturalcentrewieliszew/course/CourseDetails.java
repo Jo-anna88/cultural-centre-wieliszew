@@ -3,6 +3,7 @@ package pl.joannaz.culturalcentrewieliszew.course;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Check;
 import pl.joannaz.culturalcentrewieliszew.address.Address;
 
@@ -62,13 +63,15 @@ public class CourseDetails {
     @JsonIgnore
     private Course course;
 
-    public CourseDetails(int minAge, int maxAge, BigDecimal price, int lessonDurationMinutes, String date, Address address) {
+    public CourseDetails(int minAge, int maxAge, BigDecimal price, int lessonDurationMinutes, String date,
+                         Address address, Course course) {
         this.minAge = minAge;
         this.maxAge = maxAge;
         this.price = price;
         this.lessonDurationMinutes = lessonDurationMinutes;
         this.date = date;
         this.address = address;
+        this.course = course;
     }
 
     public CourseDetails() {}

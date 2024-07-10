@@ -28,7 +28,7 @@ public class RestSecurityConfig { // import org.springframework.security.config.
     private final JWTService jwtService;
     //private final JWTAuthenticationEntryPoint unauthorizedHandler;
 
-    @Bean //?
+    @Bean
     public PasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
     }
@@ -66,10 +66,10 @@ public class RestSecurityConfig { // import org.springframework.security.config.
                         .requestMatchers("/api/booking/**").permitAll()
                         .requestMatchers("/api/user/**").permitAll() // just for testing
                         .requestMatchers(HttpMethod.GET,"/api/address/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/contact").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/test/client").hasRole("CLIENT")
-                        .requestMatchers(HttpMethod.GET, "/api/test/employee").hasRole("EMPLOYEE")
-                        .requestMatchers(HttpMethod.GET, "/api/test/admin").hasRole("ADMIN")
+                        .requestMatchers("/api/contact").permitAll()
+//                        .requestMatchers(HttpMethod.GET, "/api/test/client").hasRole("CLIENT")
+//                        .requestMatchers(HttpMethod.GET, "/api/test/employee").hasRole("EMPLOYEE")
+//                        .requestMatchers(HttpMethod.GET, "/api/test/admin").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 );
 //                .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))

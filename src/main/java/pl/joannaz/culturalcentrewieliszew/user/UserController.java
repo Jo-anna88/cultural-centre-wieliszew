@@ -123,20 +123,20 @@ public class UserController {
         userService.deleteChild(id);
     }
 
-    @GetMapping("child/{id}")
+    @GetMapping("/child/{id}")
     public UserDTO getChildById(@PathVariable("id") UUID id) {
         return new UserDTO(userService.getUser(id));
     }
 
     // User's courses endpoints:
 
-    @GetMapping("/courses")
+    @GetMapping("/courses") // get courses for current user
     public List<CourseBasicInfo> getCourses() {
         User currentUser = userService.getCurrentUser();
         return userService.getCoursesForUser(currentUser.getId());
     }
 
-    @GetMapping("/courses/{id}")
+    @GetMapping("/courses/{id}") // get courses by user id
     public List<CourseBasicInfo> getCoursesByUserId(@PathVariable("id") UUID userId) {
         return userService.getCoursesForUser(userId);
     }
