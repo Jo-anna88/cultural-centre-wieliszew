@@ -5,6 +5,7 @@ import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,7 @@ public class ContactMessageService {
         this.sender = javaMailSender;
     }
 
-    public void send (ContactMessage message) throws MessagingException {
+    public void send (ContactMessage message) throws MessagingException, MailException {
         MimeMessage mimeMessage = sender.createMimeMessage();
         MimeMessageHelper helper;
 
@@ -38,7 +39,7 @@ public class ContactMessageService {
         try {
             logger.info("Sending message with usage of JavaMailSender.");
             sender.send(mimeMessage);
-        } catch (Exception e) {
+        } catch (MailException e) {
             logger.error("Error during sending message: {}", e.getMessage());
         }
     }

@@ -1,6 +1,7 @@
 package pl.joannaz.culturalcentrewieliszew.contactmessage;
 
 import jakarta.mail.MessagingException;
+import org.springframework.mail.MailException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +20,7 @@ public class ContactMessageController {
     public void sendMessage(@RequestBody ContactMessage message) {
         try {
             this.contactMessageService.send(message);
-        } catch (MessagingException e) {
+        } catch (MessagingException | MailException e) {
             throw new RuntimeException(e.getMessage());
         }
     }
