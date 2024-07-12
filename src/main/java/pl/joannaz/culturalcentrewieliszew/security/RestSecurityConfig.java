@@ -59,7 +59,7 @@ public class RestSecurityConfig { // import org.springframework.security.config.
                 .csrf(AbstractHttpConfigurer::disable) // against method reference we could use lambda: (csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // to re-authenticate the user on every request
                 .authorizeHttpRequests(auth -> auth
-                        // for pre-flight requests
+                        // for pre-flight requests (CORS)
                         // permitAll() - requires no authorization and is a public endpoint;
                         // the Authentication is never retrieved from the session
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()

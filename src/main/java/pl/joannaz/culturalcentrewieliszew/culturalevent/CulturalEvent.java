@@ -84,6 +84,7 @@ public class CulturalEvent {
         this.description = culturalEventDTO.getDescription();
         this.price = culturalEventDTO.getPrice();
         // address set with usage of setter
+        this.maxParticipantsNumber = culturalEventDTO.getMaxParticipantsNumber();
     }
 
     public CulturalEvent(String imgSource, String name, String date, String description, BigDecimal price, Address address, int maxParticipantsNumber) {
